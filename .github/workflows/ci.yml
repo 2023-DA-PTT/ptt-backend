@@ -19,6 +19,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
       - name: convert github repository name to lowercase
         run: echo "IMAGE_REPOSITORY=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
@@ -52,7 +55,7 @@ jobs:
           tags: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_REPOSITORY }}:latest
           cache-from: type=registry,ref=${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_REPOSITORY }}:buildcache
           cache-to: type=registry,ref=${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_REPOSITORY }}:buildcache,mode=max
-
+          platforms: linux/arm64
         # This ugly bit is necessary if you don't want your cache to grow forever
         # until it hits GitHub's limit of 5GB.
         # Temp fix
