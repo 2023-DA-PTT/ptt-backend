@@ -37,7 +37,7 @@ public class InputArgumentResource {
             @PathParam("planId") long planId,
             @PathParam("stepId") long stepId) {
         return inputArgumentRepository
-                .find("step.id=? and step.plan.id=?", stepId, planId)
+                .find("step.id=?1 and step.plan.id=?2", stepId, planId)
                 .project(InputArgumentDto.class)
                 .list();
     }
@@ -49,7 +49,7 @@ public class InputArgumentResource {
             @PathParam("stepId") long stepId,
             @PathParam("inArgId") long inArgId) {
         return inputArgumentRepository
-                .find("id=? and step.id=? and step.plan.id=?", inArgId, stepId, planId)
+                .find("id=?1 and step.id=?2 and step.plan.id=?3", inArgId, stepId, planId)
                 .project(InputArgumentDto.class)
                 .singleResult();
     }

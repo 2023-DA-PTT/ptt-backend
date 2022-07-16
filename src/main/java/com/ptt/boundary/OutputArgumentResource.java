@@ -40,7 +40,7 @@ public class OutputArgumentResource {
             @PathParam("planId") long planId,
             @PathParam("stepId") long stepId) {
         return outputArgumentRepository
-                .find("step.id=? and step.plan.id=?", stepId, planId)
+                .find("step.id=?1 and step.plan.id=?2", stepId, planId)
                 .project(OutputArgumentDto.class)
                 .list();
     }
@@ -52,7 +52,7 @@ public class OutputArgumentResource {
             @PathParam("stepId") long stepId,
             @PathParam("outArgId") long outArgId) {
         return outputArgumentRepository
-                .find("id=? and step.id=? and step.plan.id=?", outArgId, stepId, planId)
+                .find("id=?1 and step.id=?2 and step.plan.id=?3", outArgId, stepId, planId)
                 .project(OutputArgumentDto.class)
                 .singleResult();
     }

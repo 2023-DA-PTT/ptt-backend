@@ -33,10 +33,10 @@ public class StepParameterRelationResource {
             @PathParam("stepId") long stepId,
             StepParameterRelationDto relationDto) {
         OutputArgument outputArgument = outputArgumentRepository
-                .find("id=? and step.id=? and step.plan.id=?", relationDto.fromId, stepId, planId)
+                .find("id=?1 and step.id=?2 and step.plan.id=?3", relationDto.fromId, stepId, planId)
                 .singleResult();
         InputArgument inputArgument = inputArgumentRepository
-                .find("id=? and step.id=? and step.plan.id=?", relationDto.toId, stepId, planId)
+                .find("id=?1 and step.id=?2 and step.plan.id=?3", relationDto.toId, stepId, planId)
                 .singleResult();
         StepParameterRelation stepParameterRelation = new StepParameterRelation();
         stepParameterRelation.from = outputArgument;
@@ -50,7 +50,7 @@ public class StepParameterRelationResource {
             @PathParam("planId") long planId,
             @PathParam("stepId") long stepId) {
         return relationRepository
-                .find("from.step.id=? and from.step.plan.id=? or to.step.id=? and to.step.plan.id=?",
-                stepId,planId,stepId,planId).project(StepParameterRelationDto.class).list();
+                .find("from.step.id=?1 and from.step.plan.id=?2 or to.step.id=?1 and to.step.plan.id=?2",
+                stepId,planId).project(StepParameterRelationDto.class).list();
     }
 }

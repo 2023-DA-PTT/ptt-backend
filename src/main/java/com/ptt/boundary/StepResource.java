@@ -1,6 +1,5 @@
 package com.ptt.boundary;
 
-import com.ptt.control.PlanRepository;
 import com.ptt.control.StepRepository;
 import com.ptt.entity.Step;
 import com.ptt.entity.dto.StepDto;
@@ -8,7 +7,6 @@ import com.ptt.entity.dto.StepDto;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 
@@ -28,7 +26,7 @@ public class StepResource {
     @GET
     @Path("{stepId}")
     public StepDto getAllStepByIdForPlan(@PathParam("planId") long planId, @PathParam("stepId") long stepId) {
-        return stepRepository.find("plan.id = ? and id = ?", planId, stepId).project(StepDto.class).singleResult();
+        return stepRepository.find("plan.id = ?1 and id = ?2", planId, stepId).project(StepDto.class).singleResult();
     }
 
     @POST
