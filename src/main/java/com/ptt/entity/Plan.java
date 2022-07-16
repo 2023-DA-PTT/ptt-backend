@@ -9,7 +9,7 @@ import java.util.List;
 
 public class Plan extends PanacheEntityBase {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
     @OneToOne
     public Step start;

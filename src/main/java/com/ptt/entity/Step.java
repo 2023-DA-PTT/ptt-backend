@@ -7,7 +7,7 @@ import java.util.List;
 
 @Entity
 public class Step extends PanacheEntityBase {
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
     @ManyToOne
     public Plan plan;
