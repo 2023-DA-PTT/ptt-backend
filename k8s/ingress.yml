@@ -2,7 +2,16 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: ptt-backend-ingress
+  namespace: ptt
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    traefik.ingress.kubernetes.io/router.middlewares: ptt-redirect@kubernetescrd
 spec:
+  tls:
+    - secretName: api-perftest-tech-tls
+      hosts:
+        - api.perftest.tech
   rules:
     - host: "api.perftest.tech"
       http:
@@ -14,3 +23,13 @@ spec:
                 name: ptt-backend-service
                 port:
                   number: 8080
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: redirect
+  namespace: ptt
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true
