@@ -8,8 +8,8 @@ public class StepParameterRelationDto {
     public Long fromId;
     public Long toId;
 
-    public StepParameterRelationDto(@ProjectedFieldName("from.id") Long fromId,
-                                    @ProjectedFieldName("to.id") Long toId) {
+    public StepParameterRelationDto(@ProjectedFieldName("fromArg.id") Long fromId,
+                                    @ProjectedFieldName("toArg.id") Long toId) {
         this.fromId = fromId;
         this.toId = toId;
     }

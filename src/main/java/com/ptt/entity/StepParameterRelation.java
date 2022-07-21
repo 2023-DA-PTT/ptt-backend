@@ -9,7 +9,7 @@ public class StepParameterRelation extends PanacheEntityBase {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
     @ManyToOne
-    public InputArgument to;
+    public InputArgument toArg;
     @ManyToOne
-    public OutputArgument from;
+    public OutputArgument fromArg;
 }
