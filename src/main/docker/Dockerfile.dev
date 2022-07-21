@@ -1,7 +1,7 @@
-FROM quay.io/quarkus/ubi-quarkus-native-image:22.0.0-java17
+FROM maven:3.8.5-openjdk-17
 
 WORKDIR /app
 
 ENV QUARKUS_HTTP_HOST=0.0.0.0
 
-ENTRYPOINT [ "./mvnw", "compile", "quarkus:dev" ]
+ENTRYPOINT [ "mvn", "compile", "quarkus:dev" ]
