@@ -30,12 +30,13 @@ public class PlanResource {
     PlanRepository planRepository;
     @Inject
     UserRepository userRepository;
-
+/*
     private final KubernetesClient kubernetesClient;
 
     public PlanResource(KubernetesClient kubernetesClient) {
         this.kubernetesClient = kubernetesClient;
     }
+ */
 
     @GET
     public List<PlanDto> getAllPlans() {
@@ -61,7 +62,7 @@ public class PlanResource {
       imagePullSecrets:
       - name: dockerconfigjson-github-com
      */
-    @GET
+    /*@GET
     @Path("user/{userId}/run")
     public Response runTestPlan(@PathParam("userId") long userId) {
         kubernetesClient.pods().create(
@@ -91,7 +92,7 @@ public class PlanResource {
         );
 
         return Response.noContent().build();
-    }
+    }*/
 
     @GET
     @Path("{id}")

@@ -1,6 +1,8 @@
 package com.ptt.boundary;
 
+import com.ptt.control.PlanRepository;
 import com.ptt.control.StepRepository;
+import com.ptt.entity.Plan;
 import com.ptt.entity.Step;
 import com.ptt.entity.dto.StepDto;
 
@@ -17,6 +19,9 @@ public class StepResource {
 
     @Inject
     StepRepository stepRepository;
+
+    @Inject
+    PlanRepository planRepository;
 
     @GET
     public List<StepDto> getAllStepsForPlan(@PathParam("planId") long planId) {
@@ -40,6 +45,29 @@ public class StepResource {
         step.description = stepDto.description;
         step.method = stepDto.method;
         step.url = stepDto.url;
+
+        Plan plan = planRepository.findById(planId);
+        step.plan = plan;
+
+        stepRepository.persist(step);
+        return stepDto;
+    }
+
+    @POST
+    @Path("{stepId}")
+    @Transactional
+    public StepDto updateStepForPlan(
+            @PathParam("planId") long planId,
+            @PathParam("stepId") long stepId,
+            StepDto stepDto) {
+        Step step = stepRepository.findById(stepId);
+        
+        step.name = stepDto.name;
+        step.body = stepDto.body;
+        step.description = stepDto.description;
+        step.method = stepDto.method;
+        step.url = stepDto.url;
+
         stepRepository.persist(step);
         return stepDto;
     }
