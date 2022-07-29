@@ -1,7 +1,9 @@
 package com.ptt.boundary;
 
 import com.ptt.control.InputArgumentRepository;
+import com.ptt.control.StepRepository;
 import com.ptt.entity.InputArgument;
+import com.ptt.entity.Step;
 import com.ptt.entity.dto.InputArgumentDto;
 
 import javax.inject.Inject;
@@ -17,6 +19,9 @@ public class InputArgumentResource {
     @Inject
     InputArgumentRepository inputArgumentRepository;
 
+    @Inject
+    StepRepository stepRepository;
+
     @POST
     @Transactional
     public InputArgumentDto createInputArgumentForStep(
@@ -25,6 +30,10 @@ public class InputArgumentResource {
             InputArgumentDto inputArgumentDto) {
         InputArgument inputArgument = new InputArgument();
         inputArgument.name = inputArgumentDto.name;
+
+        Step step = stepRepository.findById(stepId);
+        inputArgument.step = step;
+
         inputArgumentRepository.persist(inputArgument);
         return inputArgumentDto;
     }
