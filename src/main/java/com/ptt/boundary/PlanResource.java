@@ -5,16 +5,12 @@ import com.ptt.control.UserRepository;
 import com.ptt.entity.Plan;
 import com.ptt.entity.User;
 import com.ptt.entity.dto.PlanDto;
-import io.fabric8.kubernetes.api.model.*;
-import io.fabric8.kubernetes.client.KubernetesClient;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.time.Instant;
 import java.util.List;
 
 @Path("plan")

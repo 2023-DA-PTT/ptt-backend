@@ -1,11 +1,8 @@
 package com.ptt.boundary;
 
 import com.ptt.control.InputArgumentRepository;
-import com.ptt.control.OutputArgumentRepository;
 import com.ptt.entity.InputArgument;
-import com.ptt.entity.OutputArgument;
 import com.ptt.entity.dto.InputArgumentDto;
-import com.ptt.entity.dto.OutputArgumentDto;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
