@@ -24,6 +24,16 @@ spec:
             limits:
               memory: "128Mi"
               cpu: "500m"
+        - name: mqtt
+          image: eclipse-mosquitto:latest
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
         - name: postgres
           image: postgres:12.11
           imagePullPolicy: "IfNotPresent"
