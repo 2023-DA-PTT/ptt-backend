@@ -27,6 +27,11 @@ spec:
         - name: mqtt
           image: eclipse-mosquitto:latest
           imagePullPolicy: Always
+          ports:
+            - name: mqtt1
+              containerPort: 1883
+            - name: mqtt2
+              containerPort: 9001
           resources:
             requests:
               memory: "64Mi"
