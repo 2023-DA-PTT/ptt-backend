@@ -16,7 +16,7 @@ spec:
       containers:
         - name: backend
           image: ghcr.io/2023-da-ptt/ptt-backend:latest
-          imagePullPolicy: Always
+          #imagePullPolicy: Always
           resources:
             requests:
               memory: "64Mi"
