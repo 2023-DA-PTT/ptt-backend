@@ -7,7 +7,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
 import com.ptt.control.DataPointRepository;
-import com.ptt.entity.DataPoint;
+import com.ptt.entity.dto.DataPointDto;
 
 @Path("datapoint")
 public class DataPointResource {
@@ -15,7 +15,7 @@ public class DataPointResource {
     DataPointRepository dataPointRepository;
 
     @GET
-    public List<DataPoint> getAllDataPoints() {
-        return dataPointRepository.listAll();
+    public List<DataPointDto> getAllDataPoints() {
+        return dataPointRepository.findAll().project(DataPointDto.class).list();
     }
 }

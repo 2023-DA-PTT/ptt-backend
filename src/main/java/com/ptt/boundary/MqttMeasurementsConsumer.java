@@ -12,7 +12,10 @@ import org.eclipse.microprofile.reactive.messaging.Message;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ptt.control.DataPointRepository;
+import com.ptt.control.PlanRunRepository;
+import com.ptt.control.StepRepository;
 import com.ptt.entity.DataPoint;
+import com.ptt.entity.dto.DataPointClientDto;
 
 import io.smallrye.reactive.messaging.annotations.Blocking;
 
@@ -22,15 +25,27 @@ public class MqttMeasurementsConsumer {
     @Inject
     DataPointRepository dataPointRepository;
 
+    @Inject
+    PlanRunRepository planRunRepository;
+    
+    @Inject
+    StepRepository stepRepository;
+
     @Incoming("measurements")
     @Blocking
     @Transactional
     public CompletionStage<Void> consume(Message<byte[]> measurement) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            DataPoint dp = objectMapper.readValue(new String(measurement.getPayload()) , DataPoint.class);
-            dataPointRepository.persist(dp);
-            System.out.println(dp);
+            DataPointClientDto dataPointDto = objectMapper.readValue(new String(measurement.getPayload()) , DataPointClientDto.class);
+
+            DataPoint dataPoint = new DataPoint();
+            dataPoint.setPlanRun(planRunRepository.findById(dataPointDto.getPlanId()));
+            dataPoint.setStep(stepRepository.findById(dataPointDto.getStepId()));
+            dataPoint.setStartTime(dataPointDto.getStartTime());
+            dataPoint.setDuration(dataPointDto.getDuration());
+
+            dataPointRepository.persist(dataPoint);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }

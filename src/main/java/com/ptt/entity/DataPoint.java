@@ -4,53 +4,52 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class DataPoint {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private long planId;
-    private long stepId;
+    @ManyToOne
+    private PlanRun planRun;
+    @ManyToOne
+    private Step step;
     private long startTime;
     private long duration;
-
-    @JsonCreator
-    public DataPoint(@JsonProperty("planId") long planId, @JsonProperty("stepId") long stepId, @JsonProperty("startTime") long startTime, @JsonProperty("duration") long duration) {
-        this.planId = planId;
-        this.stepId = stepId;
-        this.startTime = startTime;
-        this.duration = duration;
-    }
 
     public DataPoint() {
     }
 
-    public long getPlanId() {
-        return planId;
+    public long getId() {
+        return id;
     }
-    public long getStepId() {
-        return stepId;
+
+    public PlanRun getPlanRun() {
+        return planRun;
     }
+
+    public void setPlanRun(PlanRun planRun) {
+        this.planRun = planRun;
+    }
+
+    public Step getStep() {
+        return step;
+    }
+
+    public void setStep(Step step) {
+        this.step = step;
+    }
+
     public long getStartTime() {
         return startTime;
     }
+
     public long getDuration() {
         return duration;
     }
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public void setPlanId(long planId) {
-        this.planId = planId;
-    }
-
-    public void setStepId(long stepId) {
-        this.stepId = stepId;
     }
 
     public void setStartTime(long startTime) {
@@ -63,9 +62,7 @@ public class DataPoint {
 
     @Override
     public String toString() {
-        return "DataPoint [duration=" + duration + ", planId=" + planId + ", startTime=" + startTime + ", stepId="
-                + stepId + "]";
-    }
-
-    
+        return "DataPoint [duration=" + duration + ", id=" + id + ", planRun=" + planRun + ", startTime=" + startTime
+                + ", step=" + step + "]";
+    } 
 }

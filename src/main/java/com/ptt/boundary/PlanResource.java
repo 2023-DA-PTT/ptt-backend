@@ -26,13 +26,6 @@ public class PlanResource {
     PlanRepository planRepository;
     @Inject
     UserRepository userRepository;
-/*
-    private final KubernetesClient kubernetesClient;
-
-    public PlanResource(KubernetesClient kubernetesClient) {
-        this.kubernetesClient = kubernetesClient;
-    }
- */
 
     @GET
     public List<PlanDto> getAllPlans() {
@@ -44,51 +37,6 @@ public class PlanResource {
     public List<PlanDto> getAllPlansForUser(@PathParam("userId") long userId) {
         return planRepository.find("plan.user.id", userId).project(PlanDto.class).list();
     }
-
-    /*
-    apiVersion: v1
-    kind: Pod
-    metadata:
-      name: ptt-client-test
-      namespace: ptt
-    spec:
-      containers:
-      - name: ptt-client-test
-        image: ghcr.io/2023-da-ptt/ptt-client:latest
-      imagePullSecrets:
-      - name: dockerconfigjson-github-com
-     */
-    /*@GET
-    @Path("user/{userId}/run")
-    public Response runTestPlan(@PathParam("userId") long userId) {
-        kubernetesClient.pods().create(
-                new PodBuilder()
-                        .withApiVersion("v1")
-                        .withKind("Pod")
-                        .withMetadata(
-                                new ObjectMetaBuilder()
-                                        .withName("ptt-client")
-                                        .withNamespace("ptt")
-                                        .build())
-                        .withSpec(
-                                new PodSpecBuilder()
-                                        .withContainers(
-                                                new ContainerBuilder()
-                                                        .withName("ptt-client-" + Instant.now().getEpochSecond())
-                                                        .withImage("ghcr.io/2023-da-ptt/ptt-client:latest")
-                                                        .build()
-                                        ).withImagePullSecrets(
-                                                new LocalObjectReferenceBuilder()
-                                                        .withName("dockerconfigjson-github-com")
-                                                        .build()
-                                        )
-                                        .build()
-                        )
-                        .build()
-        );
-
-        return Response.noContent().build();
-    }*/
 
     @GET
     @Path("{id}")
