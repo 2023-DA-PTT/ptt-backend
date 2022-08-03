@@ -11,6 +11,8 @@ import javax.transaction.Transactional;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Path("plan")
@@ -29,7 +31,8 @@ public class PlanResource {
 
     @GET
     public List<PlanDto> getAllPlans() {
-        return planRepository.findAll().project(PlanDto.class).list();
+        //return new ArrayList<PlanDto>();
+       return planRepository.findAll().project(PlanDto.class).list();
     }
 
     @GET

@@ -1,7 +1,19 @@
-FROM maven:3.8.5-openjdk-17
+FROM quay.io/quarkus/centos-quarkus-maven:21.3.2-java11 as build
 
-WORKDIR /app
+USER root
 
-ENV QUARKUS_HTTP_HOST=0.0.0.0
+RUN mkdir -p /usr/src/app
 
-ENTRYPOINT [ "mvn", "compile", "quarkus:dev" ]
+# Set the maven mirrors in the maven settings if available
+
+RUN /usr/local/bin/entrypoint-run.sh
+
+WORKDIR /usr/src/app
+
+COPY pom.xml /usr/src/app/
+
+RUN mvn install
+
+COPY src /usr/src/app/src
+
+CMD [ "mvn", "clean", "compile", "quarkus:dev" ]

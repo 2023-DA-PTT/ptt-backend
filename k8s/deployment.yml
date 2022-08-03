@@ -19,11 +19,11 @@ spec:
           #imagePullPolicy: Always
           resources:
             requests:
-              memory: "64Mi"
-              cpu: "250m"
-            limits:
-              memory: "128Mi"
+              memory: "512Mi"
               cpu: "500m"
+            limits:
+              memory: "2048Mi"
+              cpu: "1000m"
         - name: mqtt
           image: eclipse-mosquitto:latest
           imagePullPolicy: Always
