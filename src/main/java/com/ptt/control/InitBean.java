@@ -2,6 +2,7 @@ package com.ptt.control;
 
 import com.ptt.entity.*;
 import io.quarkus.runtime.StartupEvent;
+import io.quarkus.runtime.configuration.ProfileManager;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
@@ -26,6 +27,9 @@ public class InitBean {
 
     @Transactional
     void onStart(@Observes StartupEvent ev) {
+        if(ProfileManager.getActiveProfile().equals("prod")) {
+            return;
+        }
         User defaultUser = new User();
         defaultUser.username = "default";
         userRepository.persist(defaultUser);
