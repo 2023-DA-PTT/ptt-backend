@@ -12,7 +12,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Path("plan")
@@ -31,7 +30,6 @@ public class PlanResource {
 
     @GET
     public List<PlanDto> getAllPlans() {
-        //return new ArrayList<PlanDto>();
        return planRepository.findAll().project(PlanDto.class).list();
     }
 
