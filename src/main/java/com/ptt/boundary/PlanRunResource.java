@@ -85,7 +85,7 @@ public class PlanRunResource {
     @Transactional
     public PlanRunDto createPlanRun(PlanRunDto planRunDto) {
         PlanRun planRun = new PlanRun();
-        planRun.plan = planRepository.findById(planRunDto.getId());
+        planRun.plan = planRepository.findById(planRunDto.getPlanId());
         planRun.startTime = planRunDto.getStartTime();
         planRun.duration = planRunDto.getDuration();
         planRunRepository.persist(planRun);
