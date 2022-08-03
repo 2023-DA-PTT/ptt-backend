@@ -4,14 +4,14 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class DataPointClientDto {
-    private long planId;
+    private long planRunId;
     private long stepId;
     private long startTime;
     private long duration;
 
     @JsonCreator
-    public DataPointClientDto(@JsonProperty("planId") long planId, @JsonProperty("stepId") long stepId, @JsonProperty("startTime") long startTime, @JsonProperty("duration") long duration) {
-        this.planId = planId;
+    public DataPointClientDto(@JsonProperty("planRunId") long planRunId, @JsonProperty("stepId") long stepId, @JsonProperty("startTime") long startTime, @JsonProperty("duration") long duration) {
+        this.planRunId = planRunId;
         this.stepId = stepId;
         this.startTime = startTime;
         this.duration = duration;
@@ -20,9 +20,14 @@ public class DataPointClientDto {
     public DataPointClientDto() {
     }
 
-    public long getPlanId() {
-        return planId;
+    public long getPlanRunId() {
+        return planRunId;
     }
+
+    public void setPlanRunId(long planRunId) {
+        this.planRunId = planRunId;
+    }
+
     public long getStepId() {
         return stepId;
     }
@@ -31,10 +36,6 @@ public class DataPointClientDto {
     }
     public long getDuration() {
         return duration;
-    }
-
-    public void setPlanId(long planId) {
-        this.planId = planId;
     }
 
     public void setStepId(long stepId) {
@@ -51,9 +52,7 @@ public class DataPointClientDto {
 
     @Override
     public String toString() {
-        return "DataPoint [duration=" + duration + ", planId=" + planId + ", startTime=" + startTime + ", stepId="
-                + stepId + "]";
+        return "DataPointClientDto [duration=" + duration + ", planRunId=" + planRunId + ", startTime=" + startTime
+                + ", stepId=" + stepId + "]";
     }
-
-    
 }

@@ -40,7 +40,7 @@ public class MqttMeasurementsConsumer {
             DataPointClientDto dataPointDto = objectMapper.readValue(new String(measurement.getPayload()) , DataPointClientDto.class);
 
             DataPoint dataPoint = new DataPoint();
-            dataPoint.setPlanRun(planRunRepository.findById(dataPointDto.getPlanId()));
+            dataPoint.setPlanRun(planRunRepository.findById(dataPointDto.getPlanRunId()));
             dataPoint.setStep(stepRepository.findById(dataPointDto.getStepId()));
             dataPoint.setStartTime(dataPointDto.getStartTime());
             dataPoint.setDuration(dataPointDto.getDuration());

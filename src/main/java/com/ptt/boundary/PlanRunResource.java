@@ -7,6 +7,7 @@ import javax.transaction.Transactional;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 
 import com.ptt.control.PlanRepository;
 import com.ptt.control.PlanRunRepository;
@@ -72,6 +73,12 @@ public class PlanRunResource {
     @GET
     public List<PlanRunDto> getAllDataPoints() {
         return planRunRepository.findAll().project(PlanRunDto.class).list();
+    }
+
+    @GET
+    @Path("{planrunid}")
+    public PlanRunDto getAllDataPointById(@PathParam("planrunid") long id) {
+        return planRunRepository.find("id", id).project(PlanRunDto.class).singleResult();
     }
 
     @POST
