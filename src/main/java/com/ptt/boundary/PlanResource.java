@@ -79,7 +79,7 @@ public class PlanResource {
                                                         .build()
                                         ).withImagePullSecrets(
                                                 new LocalObjectReferenceBuilder()
-                                                        .withName("docerconfigjson-github-com")
+                                                        .withName("dockerconfigjson-github-com")
                                                         .build()
                                         )
                                         .build()
