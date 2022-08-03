@@ -1,17 +1,9 @@
 package com.ptt.entity.dto;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-@Entity
 public class DataPointClientDto {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
     private long planId;
     private long stepId;
     private long startTime;
@@ -39,10 +31,6 @@ public class DataPointClientDto {
     }
     public long getDuration() {
         return duration;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public void setPlanId(long planId) {

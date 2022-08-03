@@ -3,17 +3,23 @@ package com.ptt.boundary;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.transaction.Transactional;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
+import com.ptt.control.PlanRepository;
 import com.ptt.control.PlanRunRepository;
+import com.ptt.entity.PlanRun;
 import com.ptt.entity.dto.PlanRunDto;
 
 @Path("planrun")
 public class PlanRunResource {
     @Inject
     PlanRunRepository planRunRepository;
-
+    
+    @Inject
+    PlanRepository planRepository;
  
     /*
     @Inject
@@ -66,5 +72,16 @@ public class PlanRunResource {
     @GET
     public List<PlanRunDto> getAllDataPoints() {
         return planRunRepository.findAll().project(PlanRunDto.class).list();
+    }
+
+    @POST
+    @Transactional
+    public PlanRunDto createPlanRun(PlanRunDto planRunDto) {
+        PlanRun planRun = new PlanRun();
+        planRun.plan = planRepository.findById(planRunDto.getId());
+        planRun.startTime = planRunDto.getStartTime();
+        planRun.duration = planRunDto.getDuration();
+        planRunRepository.persist(planRun);
+        return planRunDto;
     }
 }
