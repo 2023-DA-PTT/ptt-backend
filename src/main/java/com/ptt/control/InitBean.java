@@ -8,6 +8,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+
 import java.util.ArrayList;
 
 @ApplicationScoped
@@ -24,6 +25,8 @@ public class InitBean {
     InputArgumentRepository inputArgumentRepository;
     @Inject
     StepParameterRelationRepository relationRepository;
+    @Inject
+    PlanRunRepository planRunRepository;
 
     @Transactional
     void onStart(@Observes StartupEvent ev) {
@@ -46,8 +49,8 @@ public class InitBean {
         start.name = "Sign Up";
         start.description = "Creates an account";
         start.method = "POST";
-        start.url = "https://localhost:8081/signup";
-        start.body = "{username: 'user', password: 'pw'}";
+        start.url = "http://ptt-test-environment-service:8080/sign-up";
+        start.body = "{\"username\": \"user\", \"password\": \"pw\"}";
         start.nextSteps = new ArrayList<>();
         stepRepository.persist(start);
 
@@ -71,8 +74,8 @@ public class InitBean {
         login.name = "Login";
         login.description = "Sign into an account ";
         login.method = "POST";
-        login.url = "https://localhost:8081/login";
-        login.body = "{username: {{username}}, password: {{password}}}";
+        login.url = "http://ptt-test-environment-service:8080/login";
+        login.body = "{\"username\": \"{{username}}\", \"password\": \"{{password}}\"}";
         login.nextSteps = new ArrayList<>();
         stepRepository.persist(login);
 
@@ -104,5 +107,11 @@ public class InitBean {
         pwParamRelation.fromArg = outArgPw;
         pwParamRelation.toArg = inArgPw;
         relationRepository.persist(pwParamRelation);
+
+        PlanRun planRun = new PlanRun();
+        planRun.plan = plan;
+        planRun.startTime = System.currentTimeMillis();
+        planRun.duration = 5 * 60 * 1000; // 5 min
+        planRunRepository.persist(planRun);
     }
 }
