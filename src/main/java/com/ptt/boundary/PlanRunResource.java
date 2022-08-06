@@ -1,5 +1,6 @@
 package com.ptt.boundary;
 
+import java.time.Instant;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -38,13 +39,17 @@ public class PlanRunResource {
  
     @POST
     @Path("{planrunid}/run")
-    public Response runTestPlan(@PathParam("planrunid") long userId) {
+    public Response runTestPlan(@PathParam("planrunid") long planRunId) {
+        PlanRun planRun = planRunRepository.findById(planRunId);
+        if(planRun == null) {
+            return Response.status(404, "Plan run doesn't exist!").build();
+        }
         kubernetesClient.batch().v1().jobs().inNamespace("ptt").create(
             new JobBuilder()
             .withApiVersion("batch/v1")
             .withMetadata(
                 new ObjectMetaBuilder()
-                .withName("ptt-client-job-1")
+                .withName("ptt-client-job-"+Instant.now().toEpochMilli())
                 .withNamespace("ptt").build())
             .withSpec(
                 new JobSpecBuilder()
@@ -60,7 +65,7 @@ public class PlanRunResource {
                             .withEnv(
                                 new EnvVarBuilder()
                                 .withName("TEST_PLANRUN_ID")
-                                .withValue("1") //Set variable
+                                .withValue(planRun.id.toString())
                                 .build()
                             )
                             .withImage("ghcr.io/2023-da-ptt/ptt-client:latest")
@@ -75,7 +80,7 @@ public class PlanRunResource {
                     .build())
                 .build())
             .build());
-        return Response.ok(kubernetesClient.pods().list().getItems()).build();
+        return Response.status(202, "Clients have been started!").build();
     }
 
     @GET
