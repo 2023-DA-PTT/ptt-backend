@@ -8,11 +8,22 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Response;
 
 import com.ptt.control.PlanRepository;
 import com.ptt.control.PlanRunRepository;
 import com.ptt.entity.PlanRun;
 import com.ptt.entity.dto.PlanRunDto;
+
+import io.fabric8.kubernetes.api.model.ContainerBuilder;
+import io.fabric8.kubernetes.api.model.EnvVarBuilder;
+import io.fabric8.kubernetes.api.model.LocalObjectReferenceBuilder;
+import io.fabric8.kubernetes.api.model.ObjectMetaBuilder;
+import io.fabric8.kubernetes.api.model.PodSpecBuilder;
+import io.fabric8.kubernetes.api.model.PodTemplateSpecBuilder;
+import io.fabric8.kubernetes.api.model.batch.v1.JobBuilder;
+import io.fabric8.kubernetes.api.model.batch.v1.JobSpecBuilder;
+import io.fabric8.kubernetes.client.KubernetesClient;
 
 @Path("planrun")
 public class PlanRunResource {
@@ -22,53 +33,50 @@ public class PlanRunResource {
     @Inject
     PlanRepository planRepository;
  
-    /*
     @Inject
     KubernetesClient kubernetesClient;
  
-    apiVersion: v1
-    kind: Pod
-    metadata:
-      name: ptt-client-test
-      namespace: ptt
-    spec:
-      containers:
-      - name: ptt-client-test
-        image: ghcr.io/2023-da-ptt/ptt-client:latest
-      imagePullSecrets:
-      - name: dockerconfigjson-github-com
-    *//*
-    @GET
-    @Path("user/{userId}/run")
-    public Response runTestPlan(@PathParam("userId") long userId) {
-        kubernetesClient.pods().create(
-                new PodBuilder()
-                        .withApiVersion("v1")
-                        .withKind("Pod")
-                        .withMetadata(
-                                new ObjectMetaBuilder()
-                                        .withName("ptt-client")
-                                        .withNamespace("ptt")
-                                        .build())
-                        .withSpec(
-                                new PodSpecBuilder()
-                                        .withContainers(
-                                                new ContainerBuilder()
-                                                        .withName("ptt-client-" + Instant.now().getEpochSecond())
-                                                        .withImage("ghcr.io/2023-da-ptt/ptt-client:latest")
-                                                        .build()
-                                        ).withImagePullSecrets(
-                                                new LocalObjectReferenceBuilder()
-                                                        .withName("dockerconfigjson-github-com")
-                                                        .build()
-                                        )
-                                        .build()
-                        )
-                        .build()
-        );
-
-        return Response.noContent().build();
-    }*/
+    @POST
+    @Path("{planrunid}/run")
+    public Response runTestPlan(@PathParam("planrunid") long userId) {
+        kubernetesClient.batch().v1().jobs().inNamespace("ptt").create(
+            new JobBuilder()
+            .withApiVersion("batch/v1")
+            .withMetadata(
+                new ObjectMetaBuilder()
+                .withName("ptt-client-job-1")
+                .withNamespace("ptt").build())
+            .withSpec(
+                new JobSpecBuilder()
+                .withTtlSecondsAfterFinished(30)
+                .withParallelism(4) //Set variable
+                .withTemplate(
+                    new PodTemplateSpecBuilder()
+                    .withSpec(
+                        new PodSpecBuilder()
+                        .withContainers(
+                            new ContainerBuilder()
+                            .withName("ptt-client-pod")
+                            .withEnv(
+                                new EnvVarBuilder()
+                                .withName("TEST_PLANRUN_ID")
+                                .withValue("1") //Set variable
+                                .build()
+                            )
+                            .withImage("ghcr.io/2023-da-ptt/ptt-client:latest")
+                            .withImagePullPolicy("Always")
+                            .build()
+                        ).withImagePullSecrets(
+                            new LocalObjectReferenceBuilder()
+                            .withName("dockerconfigjson-github-com")
+                            .build()
+                        ).withRestartPolicy("Never")
+                        .build())
+                    .build())
+                .build())
+            .build());
+        return Response.ok(kubernetesClient.pods().list().getItems()).build();
+    }
 
     @GET
     public List<PlanRunDto> getAllDataPoints() {
