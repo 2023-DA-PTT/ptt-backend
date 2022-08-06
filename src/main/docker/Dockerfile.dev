@@ -1,12 +1,8 @@
-FROM quay.io/quarkus/centos-quarkus-maven:21.3.2-java11 as build
+FROM maven:3.8.6-openjdk-11 as build
 
 USER root
 
 RUN mkdir -p /usr/src/app
-
-# Set the maven mirrors in the maven settings if available
-
-RUN /usr/local/bin/entrypoint-run.sh
 
 WORKDIR /usr/src/app
 
