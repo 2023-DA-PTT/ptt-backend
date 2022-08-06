@@ -25,6 +25,7 @@ import io.fabric8.kubernetes.api.model.PodTemplateSpecBuilder;
 import io.fabric8.kubernetes.api.model.batch.v1.JobBuilder;
 import io.fabric8.kubernetes.api.model.batch.v1.JobSpecBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.quarkus.runtime.configuration.ProfileManager;
 
 @Path("planrun")
 public class PlanRunResource {
@@ -69,7 +70,8 @@ public class PlanRunResource {
                                 .build()
                             )
                             .withImage("ghcr.io/2023-da-ptt/ptt-client:latest")
-                            .withImagePullPolicy("Always")
+                            .withImagePullPolicy(
+                                ProfileManager.getActiveProfile().equals("prod") ? "Always" : "IfNotPresent")
                             .build()
                         ).withImagePullSecrets(
                             new LocalObjectReferenceBuilder()
