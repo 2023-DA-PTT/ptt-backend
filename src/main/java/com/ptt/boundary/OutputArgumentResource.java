@@ -1,13 +1,17 @@
 package com.ptt.boundary;
 
 import com.ptt.control.OutputArgumentRepository;
+import com.ptt.control.StepRepository;
 import com.ptt.entity.OutputArgument;
+import com.ptt.entity.Step;
 import com.ptt.entity.dto.OutputArgumentDto;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 import java.util.List;
 
 @Path("plan/{planId}/step/{stepId}/outputArgument")
@@ -17,18 +21,25 @@ public class OutputArgumentResource {
 
     @Inject
     OutputArgumentRepository outputArgumentRepository;
+    @Inject
+    StepRepository stepRepository;
 
     @POST
     @Transactional
-    public OutputArgumentDto createOutputArgumentForStep(
+    public Response createOutputArgumentForStep(
             @PathParam("planId") long planId,
             @PathParam("stepId") long stepId,
             OutputArgumentDto outputArgumentDto) {
+        Step step = stepRepository.findById(stepId);
+        if(step == null) {
+            return Response.status(400).build();
+        }
         OutputArgument outputArgument = new OutputArgument();
+        outputArgument.step = step;
         outputArgument.name = outputArgumentDto.getName();
         outputArgument.jsonLocation = outputArgumentDto.getJsonLocation();
         outputArgumentRepository.persist(outputArgument);
-        return OutputArgumentDto.from(outputArgument);
+        return Response.ok(OutputArgumentDto.from(outputArgument)).build();
     }
 
     @GET
@@ -50,6 +61,6 @@ public class OutputArgumentResource {
         return outputArgumentRepository
                 .find("id=?1 and step.id=?2 and step.plan.id=?3", outArgId, stepId, planId)
                 .project(OutputArgumentDto.class)
-                .singleResult();
+                .firstResult();
     }
 }

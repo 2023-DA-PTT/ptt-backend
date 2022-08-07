@@ -13,6 +13,7 @@ import javax.ws.rs.core.Response;
 
 import com.ptt.control.PlanRepository;
 import com.ptt.control.PlanRunRepository;
+import com.ptt.entity.Plan;
 import com.ptt.entity.PlanRun;
 import com.ptt.entity.dto.PlanRunDto;
 
@@ -98,12 +99,16 @@ public class PlanRunResource {
 
     @POST
     @Transactional
-    public PlanRunDto createPlanRun(PlanRunDto planRunDto) {
+    public Response createPlanRun(PlanRunDto planRunDto) {
+        Plan plan = planRepository.findById(planRunDto.getPlanId());
+        if(plan == null) {
+            return Response.status(400).build();
+        }
         PlanRun planRun = new PlanRun();
-        planRun.plan = planRepository.findById(planRunDto.getPlanId());
+        planRun.plan = plan;
         planRun.startTime = planRunDto.getStartTime();
         planRun.duration = planRunDto.getDuration();
-        planRunRepository.persist(planRun);       
-        return PlanRunDto.from(planRun);
+        planRunRepository.persist(planRun);
+        return Response.ok(PlanRunDto.from(planRun)).build();
     }
 }

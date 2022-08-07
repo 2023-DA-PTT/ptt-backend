@@ -10,6 +10,8 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 import java.util.List;
 
 @Path("plan/{planId}/step")
@@ -36,32 +38,35 @@ public class StepResource {
 
     @POST
     @Transactional
-    public StepDto createStepForPlan(
+    public Response createStepForPlan(
             @PathParam("planId") long planId,
             StepDto stepDto) {
+        Plan plan = planRepository.findById(planId);
+        if(plan == null) {
+            return Response.status(400).build();
+        }
         Step step = new Step();
         step.name = stepDto.getName();
         step.body = stepDto.getBody();
         step.description = stepDto.getDescription();
         step.method = stepDto.getMethod();
         step.url = stepDto.getUrl();
-
-        Plan plan = planRepository.findById(planId);
         step.plan = plan;
-
         stepRepository.persist(step);
-        return StepDto.from(step);
+        return Response.ok(StepDto.from(step)).build();
     }
 
     @POST
     @Path("{stepId}")
     @Transactional
-    public StepDto updateStepForPlan(
+    public Response updateStepForPlan(
             @PathParam("planId") long planId,
             @PathParam("stepId") long stepId,
             StepDto stepDto) {
         Step step = stepRepository.findById(stepId);
-        
+        if(step == null) {
+            return Response.status(400).build();
+        }
         step.name = stepDto.getName();
         step.body = stepDto.getBody();
         step.description = stepDto.getDescription();
@@ -69,6 +74,6 @@ public class StepResource {
         step.url = stepDto.getUrl();
 
         stepRepository.persist(step);
-        return StepDto.from(step);
+        return Response.ok(StepDto.from(step)).build();
     }
 }

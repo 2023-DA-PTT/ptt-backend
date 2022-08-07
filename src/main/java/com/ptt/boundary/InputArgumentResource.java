@@ -10,6 +10,8 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 import java.util.List;
 
 @Path("plan/{planId}/step/{stepId}/inputArgument")
@@ -24,18 +26,19 @@ public class InputArgumentResource {
 
     @POST
     @Transactional
-    public InputArgumentDto createInputArgumentForStep(
+    public Response createInputArgumentForStep(
             @PathParam("planId") long planId,
             @PathParam("stepId") long stepId,
             InputArgumentDto inputArgumentDto) {
+        Step step = stepRepository.findById(stepId);
+        if(step == null) {
+            return Response.status(400).build();
+        }
         InputArgument inputArgument = new InputArgument();
         inputArgument.name = inputArgumentDto.getName();
-
-        Step step = stepRepository.findById(stepId);
         inputArgument.step = step;
-
         inputArgumentRepository.persist(inputArgument);
-        return InputArgumentDto.from(inputArgument);
+        return Response.ok(InputArgumentDto.from(inputArgument)).status(201).build();
     }
 
     @GET
@@ -57,6 +60,6 @@ public class InputArgumentResource {
         return inputArgumentRepository
                 .find("id=?1 and step.id=?2 and step.plan.id=?3", inArgId, stepId, planId)
                 .project(InputArgumentDto.class)
-                .singleResult();
+                .firstResult();
     }
 }
