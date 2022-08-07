@@ -1,5 +1,6 @@
 package com.ptt.boundary;
 
+import java.time.Instant;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -16,7 +17,6 @@ import com.ptt.control.PttClientManager;
 import com.ptt.entity.Plan;
 import com.ptt.entity.PlanRun;
 import com.ptt.entity.dto.PlanRunDto;
-import com.ptt.entity.dto.PlanRunInstructionDto;
 
 @Path("planrun")
 public class PlanRunResource {
@@ -29,17 +29,6 @@ public class PlanRunResource {
     @Inject
     PttClientManager clientManager;
  
-    @POST
-    @Path("{planrunid}/run")
-    public Response runTestPlan(@PathParam("planrunid") long planRunId, List<PlanRunInstructionDto> planRunInstructionDtos) {
-        PlanRun planRun = planRunRepository.findById(planRunId);
-        if(planRun == null) {
-            return Response.status(404, "Plan run doesn't exist!").build();
-        }
-        clientManager.startClient(planRunId, planRunInstructionDtos);
-        return Response.status(202, "Clients have been started!").build();
-    }
-
     @GET
     public List<PlanRunDto> getAllDataPoints() {
         return planRunRepository.findAll().project(PlanRunDto.class).list();
@@ -63,6 +52,12 @@ public class PlanRunResource {
         planRun.startTime = planRunDto.getStartTime();
         planRun.duration = planRunDto.getDuration();
         planRunRepository.persist(planRun);
-        return Response.ok(PlanRunDto.from(planRun)).build();
+
+        if(planRun.startTime < Instant.now().getEpochSecond()) {
+            clientManager.startClient(planRun.id, planRunDto.getPlanRunInstructions());
+        } else {
+            return Response.status(501,"The scheduling of clients is not yet implemented!").build();
+        }
+        return Response.accepted(PlanRunDto.from(planRun, planRunDto.getPlanRunInstructions())).build();
     }
 }

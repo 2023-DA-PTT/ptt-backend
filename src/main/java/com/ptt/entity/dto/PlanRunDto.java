@@ -1,5 +1,7 @@
 package com.ptt.entity.dto;
 
+import java.util.List;
+
 import com.ptt.entity.PlanRun;
 
 import io.quarkus.hibernate.orm.panache.common.ProjectedFieldName;
@@ -11,6 +13,7 @@ public class PlanRunDto {
     private long planId;
     private long startTime;
     private long duration;
+    private List<PlanRunInstructionDto> planRunInstructions;
 
     public PlanRunDto(long id, @ProjectedFieldName("plan.id") long planId, long startTime, long duration) {
         this.id = id;
@@ -19,8 +22,10 @@ public class PlanRunDto {
         this.duration = duration;
     }
 
-    public static PlanRunDto from(PlanRun planRun) {
-        return new PlanRunDto(planRun.id, planRun.plan.id, planRun.startTime, planRun.duration);
+    public static PlanRunDto from(PlanRun planRun, List<PlanRunInstructionDto> planRunInstructions) {
+        PlanRunDto planRunDto = new PlanRunDto(planRun.id, planRun.plan.id, planRun.startTime, planRun.duration);
+        planRunDto.planRunInstructions = planRunInstructions;
+        return planRunDto;
     }
 
     public long getId() {
@@ -53,7 +58,13 @@ public class PlanRunDto {
 
     public void setDuration(long duration) {
         this.duration = duration;
-    }    
+    }
 
-    
+    public List<PlanRunInstructionDto> getPlanRunInstructions() {
+        return planRunInstructions;
+    }
+
+    public void setPlanRunInstructions(List<PlanRunInstructionDto> planRunInstructions) {
+        this.planRunInstructions = planRunInstructions;
+    }
 }
