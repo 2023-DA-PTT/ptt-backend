@@ -28,7 +28,7 @@ public class OutputArgumentResource {
         outputArgument.name = outputArgumentDto.name;
         outputArgument.jsonLocation = outputArgumentDto.jsonLocation;
         outputArgumentRepository.persist(outputArgument);
-        return outputArgumentDto;
+        return OutputArgumentDto.from(outputArgument);
     }
 
     @GET

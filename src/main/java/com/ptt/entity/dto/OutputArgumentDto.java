@@ -1,5 +1,7 @@
 package com.ptt.entity.dto;
 
+import com.ptt.entity.OutputArgument;
+
 import io.quarkus.hibernate.orm.panache.common.ProjectedFieldName;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
@@ -15,5 +17,9 @@ public class OutputArgumentDto {
         this.stepId = stepId;
         this.name = name;
         this.jsonLocation = jsonLocation;
+    }
+
+    public static OutputArgumentDto from(OutputArgument outputArgument) {
+        return new OutputArgumentDto(outputArgument.id, outputArgument.step.id, outputArgument.name, outputArgument.jsonLocation);
     }
 }

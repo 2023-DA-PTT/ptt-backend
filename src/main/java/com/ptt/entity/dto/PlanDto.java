@@ -1,5 +1,7 @@
 package com.ptt.entity.dto;
 
+import com.ptt.entity.Plan;
+
 import io.quarkus.hibernate.orm.panache.common.ProjectedFieldName;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
@@ -15,5 +17,9 @@ public class PlanDto {
         this.startId = startId;
         this.name = name;
         this.description = description;
+    }
+
+    public static PlanDto from(Plan plan) {
+        return new PlanDto(plan.id, plan.start.id, plan.name, plan.description);
     }
 }

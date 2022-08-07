@@ -55,6 +55,6 @@ public class PlanResource {
         plan.description = planDto.description;
         plan.user = user;
         planRepository.persist(plan);
-        return planDto;
+        return PlanDto.from(plan);
     }
 }

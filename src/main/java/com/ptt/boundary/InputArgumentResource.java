@@ -35,7 +35,7 @@ public class InputArgumentResource {
         inputArgument.step = step;
 
         inputArgumentRepository.persist(inputArgument);
-        return inputArgumentDto;
+        return InputArgumentDto.from(inputArgument);
     }
 
     @GET

@@ -42,7 +42,7 @@ public class StepParameterRelationResource {
         stepParameterRelation.fromArg = outputArgument;
         stepParameterRelation.toArg = inputArgument;
         relationRepository.persist(stepParameterRelation);
-        return relationDto;
+        return StepParameterRelationDto.from(stepParameterRelation);
     }
 
     @GET

@@ -50,7 +50,7 @@ public class StepResource {
         step.plan = plan;
 
         stepRepository.persist(step);
-        return stepDto;
+        return StepDto.from(step);
     }
 
     @POST
@@ -69,6 +69,6 @@ public class StepResource {
         step.url = stepDto.url;
 
         stepRepository.persist(step);
-        return stepDto;
+        return StepDto.from(step);
     }
 }

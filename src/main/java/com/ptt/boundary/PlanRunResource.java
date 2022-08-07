@@ -103,7 +103,7 @@ public class PlanRunResource {
         planRun.plan = planRepository.findById(planRunDto.getPlanId());
         planRun.startTime = planRunDto.getStartTime();
         planRun.duration = planRunDto.getDuration();
-        planRunRepository.persist(planRun);
-        return planRunDto;
+        planRunRepository.persist(planRun);       
+        return PlanRunDto.from(planRun);
     }
 }
