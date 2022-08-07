@@ -2,6 +2,9 @@ package com.ptt.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.*;
 
 @Entity
@@ -14,4 +17,6 @@ public class PlanRun extends PanacheEntityBase {
     public Plan plan;
     public long startTime;
     public long duration;
+    @OneToMany(mappedBy = "planRun")
+    public List<PlanRunInstruction> planRunInstructions = new ArrayList<>();
 }

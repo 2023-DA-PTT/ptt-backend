@@ -12,11 +12,14 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import com.ptt.control.PlanRepository;
+import com.ptt.control.PlanRunInstructionRepository;
 import com.ptt.control.PlanRunRepository;
 import com.ptt.control.PttClientManager;
 import com.ptt.entity.Plan;
 import com.ptt.entity.PlanRun;
+import com.ptt.entity.PlanRunInstruction;
 import com.ptt.entity.dto.PlanRunDto;
+import com.ptt.entity.dto.PlanRunInstructionDto;
 
 @Path("planrun")
 public class PlanRunResource {
@@ -25,19 +28,26 @@ public class PlanRunResource {
     
     @Inject
     PlanRepository planRepository;
+
+    @Inject
+    PlanRunInstructionRepository planRunInstructionRepository;
  
     @Inject
     PttClientManager clientManager;
  
     @GET
-    public List<PlanRunDto> getAllDataPoints() {
+    public List<PlanRunDto> getAllPlanRuns() {
         return planRunRepository.findAll().project(PlanRunDto.class).list();
     }
 
     @GET
     @Path("{planrunid}")
-    public PlanRunDto getAllDataPointById(@PathParam("planrunid") long id) {
-        return planRunRepository.find("id", id).project(PlanRunDto.class).singleResult();
+    public PlanRunDto getPlanRunById(@PathParam("planrunid") long id) {
+        PlanRunDto planRunDto = planRunRepository.find("id", id).project(PlanRunDto.class).singleResult();
+        planRunDto.setPlanRunInstructions(planRunInstructionRepository
+            .find("planRun.id", planRunDto.getId())
+            .project(PlanRunInstructionDto.class).list());
+        return planRunDto;
     }
 
     @POST
@@ -52,12 +62,20 @@ public class PlanRunResource {
         planRun.startTime = planRunDto.getStartTime();
         planRun.duration = planRunDto.getDuration();
         planRunRepository.persist(planRun);
+        for(PlanRunInstructionDto dto : planRunDto.getPlanRunInstructions()) {
+            PlanRunInstruction instruction = new PlanRunInstruction();
+            instruction.setPlanRun(planRun);
+            instruction.setAmount(dto.getAmount());
+            instruction.setNodeName(dto.getNodeName());
+            planRunInstructionRepository.persist(instruction);
+            planRun.planRunInstructions.add(instruction);
+        }
 
         if(planRun.startTime < Instant.now().getEpochSecond()) {
             clientManager.startClient(planRun.id, planRunDto.getPlanRunInstructions());
         } else {
-            return Response.status(501,"The scheduling of clients is not yet implemented!").build();
+            return Response.status(501, "The scheduling of clients is not yet implemented!").build();
         }
-        return Response.accepted(PlanRunDto.from(planRun, planRunDto.getPlanRunInstructions())).build();
+        return Response.accepted(PlanRunDto.from(planRun)).build();
     }
 }

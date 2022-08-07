@@ -22,9 +22,9 @@ public class PlanRunDto {
         this.duration = duration;
     }
 
-    public static PlanRunDto from(PlanRun planRun, List<PlanRunInstructionDto> planRunInstructions) {
+    public static PlanRunDto from(PlanRun planRun) {
         PlanRunDto planRunDto = new PlanRunDto(planRun.id, planRun.plan.id, planRun.startTime, planRun.duration);
-        planRunDto.planRunInstructions = planRunInstructions;
+        planRunDto.planRunInstructions = PlanRunInstructionDto.from(planRun.planRunInstructions);
         return planRunDto;
     }
 
