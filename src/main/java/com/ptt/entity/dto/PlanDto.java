@@ -7,10 +7,10 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 
 @RegisterForReflection
 public class PlanDto {
-    public long id;
-    public long startId;
-    public String name;
-    public String description;
+    private long id;
+    private long startId;
+    private String name;
+    private String description;
 
     public PlanDto(long id, @ProjectedFieldName("start.id") long startId, String name, String description) {
         this.id = id;
@@ -22,4 +22,38 @@ public class PlanDto {
     public static PlanDto from(Plan plan) {
         return new PlanDto(plan.id, plan.start.id, plan.name, plan.description);
     }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public long getStartId() {
+        return startId;
+    }
+
+    public void setStartId(long startId) {
+        this.startId = startId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    
 }

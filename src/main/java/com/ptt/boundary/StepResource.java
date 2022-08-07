@@ -40,11 +40,11 @@ public class StepResource {
             @PathParam("planId") long planId,
             StepDto stepDto) {
         Step step = new Step();
-        step.name = stepDto.name;
-        step.body = stepDto.body;
-        step.description = stepDto.description;
-        step.method = stepDto.method;
-        step.url = stepDto.url;
+        step.name = stepDto.getName();
+        step.body = stepDto.getBody();
+        step.description = stepDto.getDescription();
+        step.method = stepDto.getMethod();
+        step.url = stepDto.getUrl();
 
         Plan plan = planRepository.findById(planId);
         step.plan = plan;
@@ -62,11 +62,11 @@ public class StepResource {
             StepDto stepDto) {
         Step step = stepRepository.findById(stepId);
         
-        step.name = stepDto.name;
-        step.body = stepDto.body;
-        step.description = stepDto.description;
-        step.method = stepDto.method;
-        step.url = stepDto.url;
+        step.name = stepDto.getName();
+        step.body = stepDto.getBody();
+        step.description = stepDto.getDescription();
+        step.method = stepDto.getMethod();
+        step.url = stepDto.getUrl();
 
         stepRepository.persist(step);
         return StepDto.from(step);

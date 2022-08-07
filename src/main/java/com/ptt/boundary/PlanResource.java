@@ -51,8 +51,8 @@ public class PlanResource {
     public PlanDto createPlanForUser(@PathParam("userId") long userId, PlanDto planDto) {
         User user = userRepository.findById(userId);
         Plan plan = new Plan();
-        plan.name = planDto.name;
-        plan.description = planDto.description;
+        plan.name = planDto.getName();
+        plan.description = planDto.getDescription();
         plan.user = user;
         planRepository.persist(plan);
         return PlanDto.from(plan);

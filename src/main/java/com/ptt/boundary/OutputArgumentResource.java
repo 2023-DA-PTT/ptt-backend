@@ -25,8 +25,8 @@ public class OutputArgumentResource {
             @PathParam("stepId") long stepId,
             OutputArgumentDto outputArgumentDto) {
         OutputArgument outputArgument = new OutputArgument();
-        outputArgument.name = outputArgumentDto.name;
-        outputArgument.jsonLocation = outputArgumentDto.jsonLocation;
+        outputArgument.name = outputArgumentDto.getName();
+        outputArgument.jsonLocation = outputArgumentDto.getJsonLocation();
         outputArgumentRepository.persist(outputArgument);
         return OutputArgumentDto.from(outputArgument);
     }

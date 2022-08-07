@@ -33,10 +33,10 @@ public class StepParameterRelationResource {
             @PathParam("stepId") long stepId,
             StepParameterRelationDto relationDto) {
         OutputArgument outputArgument = outputArgumentRepository
-                .find("id=?1 and step.id=?2 and step.plan.id=?3", relationDto.fromId, stepId, planId)
+                .find("id=?1 and step.id=?2 and step.plan.id=?3", relationDto.getFromId(), stepId, planId)
                 .singleResult();
         InputArgument inputArgument = inputArgumentRepository
-                .find("id=?1 and step.id=?2 and step.plan.id=?3", relationDto.toId, stepId, planId)
+                .find("id=?1 and step.id=?2 and step.plan.id=?3", relationDto.getToId(), stepId, planId)
                 .singleResult();
         StepParameterRelation stepParameterRelation = new StepParameterRelation();
         stepParameterRelation.fromArg = outputArgument;

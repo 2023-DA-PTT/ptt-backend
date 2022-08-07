@@ -29,7 +29,7 @@ public class InputArgumentResource {
             @PathParam("stepId") long stepId,
             InputArgumentDto inputArgumentDto) {
         InputArgument inputArgument = new InputArgument();
-        inputArgument.name = inputArgumentDto.name;
+        inputArgument.name = inputArgumentDto.getName();
 
         Step step = stepRepository.findById(stepId);
         inputArgument.step = step;
