@@ -14,18 +14,18 @@ public class PlanRunInstruction {
     @ManyToOne
     @JoinColumn(name="planrun_id", nullable=false)
     private PlanRun planRun;
-    private int amount;
+    private int numberOfClients;
     private String nodeName;
 
     public PlanRunInstruction() {
     }
-    
-    public int getAmount() {
-        return amount;
+
+    public int getNumberOfClients() {
+        return numberOfClients;
     }
 
-    public void setAmount(int amount) {
-        this.amount = amount;
+    public void setNumberOfClients(int numberOfClients) {
+        this.numberOfClients = numberOfClients;
     }
 
     public String getNodeName() {

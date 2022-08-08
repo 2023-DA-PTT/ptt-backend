@@ -9,32 +9,32 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 
 @RegisterForReflection
 public class PlanRunInstructionDto {
-    private int amount;
+    private int numberOfClients;
     private String nodeName;
 
-    public PlanRunInstructionDto(int amount, String nodeName) {
-        this.amount = amount;
+    public PlanRunInstructionDto(int numberOfClients, String nodeName) {
+        this.numberOfClients = numberOfClients;
         this.nodeName = nodeName;
     }
 
     public static PlanRunInstructionDto from(PlanRunInstruction planRunInstruction) {
-        return new PlanRunInstructionDto(planRunInstruction.getAmount(), planRunInstruction.getNodeName());
+        return new PlanRunInstructionDto(planRunInstruction.getNumberOfClients(), planRunInstruction.getNodeName());
     }
 
     public static List<PlanRunInstructionDto> from(List<PlanRunInstruction> planRunInstructions) {
         List<PlanRunInstructionDto> result = new ArrayList<>();
         for(PlanRunInstruction planRunInstruction : planRunInstructions) {
-            result.add(new PlanRunInstructionDto(planRunInstruction.getAmount(), planRunInstruction.getNodeName()));
+            result.add(new PlanRunInstructionDto(planRunInstruction.getNumberOfClients(), planRunInstruction.getNodeName()));
         }
         return result;
     }
-
-    public int getAmount() {
-        return amount;
+    
+    public int getNumberOfClients() {
+        return numberOfClients;
     }
 
-    public void setAmount(int amount) {
-        this.amount = amount;
+    public void setNumberOfClients(int numberOfClients) {
+        this.numberOfClients = numberOfClients;
     }
 
     public String getNodeName() {

@@ -65,7 +65,7 @@ public class PlanRunResource {
         for(PlanRunInstructionDto dto : planRunDto.getPlanRunInstructions()) {
             PlanRunInstruction instruction = new PlanRunInstruction();
             instruction.setPlanRun(planRun);
-            instruction.setAmount(dto.getAmount());
+            instruction.setNumberOfClients(dto.getNumberOfClients());
             instruction.setNodeName(dto.getNodeName());
             planRunInstructionRepository.persist(instruction);
             planRun.planRunInstructions.add(instruction);

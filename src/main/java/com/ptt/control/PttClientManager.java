@@ -40,7 +40,7 @@ public class PttClientManager {
             .withSpec(
                 new JobSpecBuilder()
                 .withTtlSecondsAfterFinished(30)
-                .withParallelism(planRunInstructionDto.getAmount())
+                .withParallelism(planRunInstructionDto.getNumberOfClients())
                 .withTemplate(
                     new PodTemplateSpecBuilder()
                     .withSpec(
