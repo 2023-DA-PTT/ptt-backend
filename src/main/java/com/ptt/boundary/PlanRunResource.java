@@ -57,9 +57,11 @@ public class PlanRunResource {
         if(plan == null) {
             return Response.status(400).build();
         }
+        long currentTime = Instant.now().getEpochSecond();
+        
         PlanRun planRun = new PlanRun();
         planRun.plan = plan;
-        planRun.startTime = planRunDto.getStartTime();
+        planRun.startTime = planRunDto.getStartTime() <= currentTime ? currentTime : planRunDto.getStartTime();
         planRun.duration = planRunDto.getDuration();
         planRunRepository.persist(planRun);
         for(PlanRunInstructionDto dto : planRunDto.getPlanRunInstructions()) {
@@ -71,7 +73,7 @@ public class PlanRunResource {
             planRun.planRunInstructions.add(instruction);
         }
 
-        if(planRun.startTime < Instant.now().getEpochSecond()) {
+        if(planRun.startTime <= currentTime) {
             clientManager.startClient(planRun.id, planRunDto.getPlanRunInstructions());
         } else {
             return Response.status(501, "The scheduling of clients is not yet implemented!").build();
