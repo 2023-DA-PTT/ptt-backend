@@ -24,10 +24,11 @@ public class InitBean {
     @Inject
     InputArgumentRepository inputArgumentRepository;
     @Inject
+    HttpStepRepository httpStepRepository;
+    @Inject
     StepParameterRelationRepository relationRepository;
     @Inject
     PlanRunRepository planRunRepository;
-
     @Transactional
     void onStart(@Observes StartupEvent ev) {
         if(ProfileManager.getActiveProfile().equals("prod")) {
@@ -48,9 +49,6 @@ public class InitBean {
         start.plan = plan;
         start.name = "Sign Up";
         start.description = "Creates an account";
-        start.method = "POST";
-        start.url = "http://ptt-test-environment-service:8080/sign-up";
-        start.body = "{\"username\": \"user\", \"password\": \"pw\"}";
         start.nextSteps = new ArrayList<>();
         stepRepository.persist(start);
 
@@ -66,6 +64,15 @@ public class InitBean {
         outArgPw.step = start;
         outputArgumentRepository.persist(outArgPw);
 
+        HttpStep startHttp = new HttpStep();
+        startHttp.id = new StepId(start, StepType.HTTP);
+        startHttp.method = "POST";
+        startHttp.url = "http://ptt-test-environment-service:8080/sign-up";
+        startHttp.body = "{\"username\": \"user\", \"password\": \"pw\"}";
+        startHttp.parameterMap.put(outArgName, "username");
+        startHttp.parameterMap.put(outArgPw, "password");
+        httpStepRepository.persist(startHttp);
+
         plan.start = start;
         planRepository.persist(plan);
 
@@ -73,9 +80,6 @@ public class InitBean {
         login.plan = plan;
         login.name = "Login";
         login.description = "Sign into an account ";
-        login.method = "POST";
-        login.url = "http://ptt-test-environment-service:8080/login";
-        login.body = "{\"username\": \"{{username}}\", \"password\": \"{{password}}\"}";
         login.nextSteps = new ArrayList<>();
         stepRepository.persist(login);
 
@@ -95,6 +99,14 @@ public class InitBean {
         outArgToken.step = login;
         outputArgumentRepository.persist(outArgToken);
 
+        HttpStep loginHttp = new HttpStep();
+        loginHttp.id = new StepId(login, StepType.HTTP);
+        loginHttp.method = "POST";
+        loginHttp.url = "http://ptt-test-environment-service:8080/login";
+        loginHttp.body = "{\"username\": \"{{username}}\", \"password\": \"{{password}}\"}";
+        loginHttp.parameterMap.put(outArgToken, "token");
+        httpStepRepository.persist(loginHttp);
+
         start.nextSteps.add(login);
         stepRepository.persist(start);
 
@@ -112,9 +124,6 @@ public class InitBean {
         sleep.plan = plan;
         sleep.name = "Sleep";
         sleep.description = "Sleep for 4 seconds";
-        sleep.method = "GET";
-        sleep.url = "http://ptt-test-environment-service:8080/sleep/{token}/4";
-        sleep.body = "";
         sleep.nextSteps = new ArrayList<>();
         stepRepository.persist(sleep);
 
@@ -123,6 +132,13 @@ public class InitBean {
         inArgToken.step = sleep;
         inputArgumentRepository.persist(inArgToken);
         
+        HttpStep sleepHttp = new HttpStep();
+        sleepHttp.id = new StepId(sleep, StepType.HTTP);
+        sleepHttp.method = "GET";
+        sleepHttp.url = "http://ptt-test-environment-service:8080/sleep/{token}/4";
+        sleepHttp.body = "";
+        httpStepRepository.persist(sleepHttp);
+
         StepParameterRelation tokenParamRelation = new StepParameterRelation();
         tokenParamRelation.fromArg = outArgToken;
         tokenParamRelation.toArg = inArgToken;

@@ -15,12 +15,8 @@ public class Step extends PanacheEntityBase {
     public List<Step> nextSteps;
     public String name;
     public String description;
-    public String method;
-    public String url;
-    public String body;
     @OneToMany
     public List<InputArgument> inputArguments;
     @OneToMany
     public List<OutputArgument> outputArguments;
-
 }

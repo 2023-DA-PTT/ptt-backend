@@ -9,21 +9,15 @@ public class StepDto {
     private long id;
     private String name;
     private String description;
-    private String method;
-    private String url;
-    private String body;
 
-    public StepDto(long id, String name, String description, String method, String url, String body) {
+    public StepDto(long id, String name, String description) {
         this.id = id;
         this.name = name;
         this.description = description;
-        this.method = method;
-        this.url = url;
-        this.body = body;
     }
 
     public static StepDto from(Step step) {
-        return new StepDto(step.id, step.name, step.description, step.method, step.url, step.body);
+        return new StepDto(step.id, step.name, step.description);
     }
 
     public long getId() {
@@ -50,29 +44,4 @@ public class StepDto {
         this.description = description;
     }
 
-    public String getMethod() {
-        return method;
-    }
-
-    public void setMethod(String method) {
-        this.method = method;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getBody() {
-        return body;
-    }
-
-    public void setBody(String body) {
-        this.body = body;
-    }
-
-    
 }
