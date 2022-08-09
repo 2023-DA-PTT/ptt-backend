@@ -11,6 +11,7 @@ import javax.transaction.Transactional;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import java.util.List;
 
@@ -48,13 +49,16 @@ public class PlanResource {
     @POST
     @Path("{userId}")
     @Transactional
-    public PlanDto createPlanForUser(@PathParam("userId") long userId, PlanDto planDto) {
+    public Response createPlanForUser(@PathParam("userId") long userId, PlanDto planDto) {
         User user = userRepository.findById(userId);
+        if(user == null) {
+            return Response.status(400).build();
+        }
         Plan plan = new Plan();
-        plan.name = planDto.name;
-        plan.description = planDto.description;
+        plan.name = planDto.getName();
+        plan.description = planDto.getDescription();
         plan.user = user;
         planRepository.persist(plan);
-        return planDto;
+        return Response.ok(PlanDto.from(plan)).status(201).build();
     }
 }

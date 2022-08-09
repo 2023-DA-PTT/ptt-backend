@@ -12,6 +12,8 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 import java.util.List;
 
 @Path("plan/{planId}/step/{stepId}/parameterRelation")
@@ -28,21 +30,24 @@ public class StepParameterRelationResource {
 
     @POST
     @Transactional
-    public StepParameterRelationDto createParameterRelation(
+    public Response createParameterRelation(
             @PathParam("planId") long planId,
             @PathParam("stepId") long stepId,
             StepParameterRelationDto relationDto) {
         OutputArgument outputArgument = outputArgumentRepository
-                .find("id=?1 and step.id=?2 and step.plan.id=?3", relationDto.fromId, stepId, planId)
-                .singleResult();
+                .find("id=?1 and step.id=?2 and step.plan.id=?3", relationDto.getFromId(), stepId, planId)
+                .firstResult();
         InputArgument inputArgument = inputArgumentRepository
-                .find("id=?1 and step.id=?2 and step.plan.id=?3", relationDto.toId, stepId, planId)
-                .singleResult();
+                .find("id=?1 and step.id=?2 and step.plan.id=?3", relationDto.getToId(), stepId, planId)
+                .firstResult();
+        if(outputArgument == null || inputArgument == null) {
+                return Response.status(400).build();
+        }
         StepParameterRelation stepParameterRelation = new StepParameterRelation();
         stepParameterRelation.fromArg = outputArgument;
         stepParameterRelation.toArg = inputArgument;
         relationRepository.persist(stepParameterRelation);
-        return relationDto;
+        return Response.ok(StepParameterRelationDto.from(stepParameterRelation)).build();
     }
 
     @GET

@@ -1,5 +1,6 @@
 package com.ptt.boundary;
 
+import java.time.Instant;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -8,11 +9,17 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Response;
 
 import com.ptt.control.PlanRepository;
+import com.ptt.control.PlanRunInstructionRepository;
 import com.ptt.control.PlanRunRepository;
+import com.ptt.control.PttClientManager;
+import com.ptt.entity.Plan;
 import com.ptt.entity.PlanRun;
+import com.ptt.entity.PlanRunInstruction;
 import com.ptt.entity.dto.PlanRunDto;
+import com.ptt.entity.dto.PlanRunInstructionDto;
 
 @Path("planrun")
 public class PlanRunResource {
@@ -21,74 +28,56 @@ public class PlanRunResource {
     
     @Inject
     PlanRepository planRepository;
- 
-    /*
+
     @Inject
-    KubernetesClient kubernetesClient;
+    PlanRunInstructionRepository planRunInstructionRepository;
  
-    apiVersion: v1
-    kind: Pod
-    metadata:
-      name: ptt-client-test
-      namespace: ptt
-    spec:
-      containers:
-      - name: ptt-client-test
-        image: ghcr.io/2023-da-ptt/ptt-client:latest
-      imagePullSecrets:
-      - name: dockerconfigjson-github-com
-    *//*
+    @Inject
+    PttClientManager clientManager;
+ 
     @GET
-    @Path("user/{userId}/run")
-    public Response runTestPlan(@PathParam("userId") long userId) {
-        kubernetesClient.pods().create(
-                new PodBuilder()
-                        .withApiVersion("v1")
-                        .withKind("Pod")
-                        .withMetadata(
-                                new ObjectMetaBuilder()
-                                        .withName("ptt-client")
-                                        .withNamespace("ptt")
-                                        .build())
-                        .withSpec(
-                                new PodSpecBuilder()
-                                        .withContainers(
-                                                new ContainerBuilder()
-                                                        .withName("ptt-client-" + Instant.now().getEpochSecond())
-                                                        .withImage("ghcr.io/2023-da-ptt/ptt-client:latest")
-                                                        .build()
-                                        ).withImagePullSecrets(
-                                                new LocalObjectReferenceBuilder()
-                                                        .withName("dockerconfigjson-github-com")
-                                                        .build()
-                                        )
-                                        .build()
-                        )
-                        .build()
-        );
-
-        return Response.noContent().build();
-    }*/
-
-    @GET
-    public List<PlanRunDto> getAllDataPoints() {
+    public List<PlanRunDto> getAllPlanRuns() {
         return planRunRepository.findAll().project(PlanRunDto.class).list();
     }
 
     @GET
     @Path("{planrunid}")
-    public PlanRunDto getAllDataPointById(@PathParam("planrunid") long id) {
-        return planRunRepository.find("id", id).project(PlanRunDto.class).singleResult();
+    public PlanRunDto getPlanRunById(@PathParam("planrunid") long id) {
+        PlanRunDto planRunDto = planRunRepository.find("id", id).project(PlanRunDto.class).singleResult();
+        planRunDto.setPlanRunInstructions(planRunInstructionRepository
+            .find("planRun.id", planRunDto.getId())
+            .project(PlanRunInstructionDto.class).list());
+        return planRunDto;
     }
 
     @POST
     @Transactional
-    public PlanRunDto createPlanRun(PlanRunDto planRunDto) {
+    public Response createPlanRun(PlanRunDto planRunDto) {
+        Plan plan = planRepository.findById(planRunDto.getPlanId());
+        if(plan == null) {
+            return Response.status(400).build();
+        }
+        long currentTime = Instant.now().getEpochSecond();
+        
         PlanRun planRun = new PlanRun();
-        planRun.plan = planRepository.findById(planRunDto.getPlanId());
-        planRun.startTime = planRunDto.getStartTime();
+        planRun.plan = plan;
+        planRun.startTime = planRunDto.getStartTime() <= currentTime ? currentTime : planRunDto.getStartTime();
         planRun.duration = planRunDto.getDuration();
         planRunRepository.persist(planRun);
-        return planRunDto;
+        for(PlanRunInstructionDto dto : planRunDto.getPlanRunInstructions()) {
+            PlanRunInstruction instruction = new PlanRunInstruction();
+            instruction.setPlanRun(planRun);
+            instruction.setNumberOfClients(dto.getNumberOfClients());
+            instruction.setNodeName(dto.getNodeName());
+            planRunInstructionRepository.persist(instruction);
+            planRun.planRunInstructions.add(instruction);
+        }
+
+        if(planRun.startTime <= currentTime) {
+            clientManager.startClient(planRun.id, planRunDto.getPlanRunInstructions());
+        } else {
+            return Response.status(501, "The scheduling of clients is not yet implemented!").build();
+        }
+        return Response.accepted(PlanRunDto.from(planRun)).build();
     }
 }

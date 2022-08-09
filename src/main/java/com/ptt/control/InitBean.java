@@ -108,6 +108,29 @@ public class InitBean {
         pwParamRelation.toArg = inArgPw;
         relationRepository.persist(pwParamRelation);
 
+        Step sleep = new Step();
+        sleep.plan = plan;
+        sleep.name = "Sleep";
+        sleep.description = "Sleep for 4 seconds";
+        sleep.method = "GET";
+        sleep.url = "http://ptt-test-environment-service:8080/sleep/{token}/4";
+        sleep.body = "";
+        sleep.nextSteps = new ArrayList<>();
+        stepRepository.persist(sleep);
+
+        InputArgument inArgToken = new InputArgument();
+        inArgToken.name = "token";
+        inArgToken.step = sleep;
+        inputArgumentRepository.persist(inArgToken);
+        
+        StepParameterRelation tokenParamRelation = new StepParameterRelation();
+        tokenParamRelation.fromArg = outArgToken;
+        tokenParamRelation.toArg = inArgToken;
+        relationRepository.persist(tokenParamRelation);
+
+        login.nextSteps.add(sleep);
+        stepRepository.persist(login);
+
         PlanRun planRun = new PlanRun();
         planRun.plan = plan;
         planRun.startTime = System.currentTimeMillis();
