@@ -4,17 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.persistence.ElementCollection;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-
 @Entity
-public class HttpStep extends PanacheEntityBase {
-
-    @EmbeddedId
-    public StepId id;
-
+public class HttpStep extends Step {
     public String method;
     public String url;
     public String body;

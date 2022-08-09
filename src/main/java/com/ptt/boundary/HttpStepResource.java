@@ -18,9 +18,6 @@ import com.ptt.control.PlanRepository;
 import com.ptt.control.StepRepository;
 import com.ptt.entity.HttpStep;
 import com.ptt.entity.Plan;
-import com.ptt.entity.Step;
-import com.ptt.entity.StepId;
-import com.ptt.entity.StepType;
 import com.ptt.entity.dto.HttpStepDto;
 
 
@@ -48,14 +45,10 @@ public class HttpStepResource {
             return Response.status(400).build();
         }
 
-        Step step = new Step();
-        step.name = httpStepDto.getName();
-        step.description = httpStepDto.getDescription();
-        step.plan = plan;
-        stepRepository.persist(step);
-
         HttpStep httpStep = new HttpStep();
-        httpStep.id = new StepId(step, StepType.HTTP);
+        httpStep.name = httpStepDto.getName();
+        httpStep.description = httpStepDto.getDescription();
+        httpStep.plan = plan;
         httpStep.body = httpStepDto.getBody();
         httpStep.method = httpStepDto.getMethod();
         httpStep.url = httpStepDto.getUrl();
@@ -75,21 +68,14 @@ public class HttpStepResource {
         if(plan == null) {
             return Response.status(400).build();
         }
-
-        Step step = stepRepository.findById(stepId);
-        if(step == null) {
-            return Response.status(400).build();
-        }
         HttpStep httpStep = httpStepRepository
-            .find("id.step.id=?1 and id.type.type=?2", stepId, StepType.HTTP).firstResult();
+            .find("id=?1", stepId).firstResult();
         if(httpStep == null) {
             return Response.status(400).build();
         }
 
-        step.name = httpStepDto.getName();
-        step.description = httpStepDto.getDescription();
-        stepRepository.persist(step);
-
+        httpStep.name = httpStepDto.getName();
+        httpStep.description = httpStepDto.getDescription();
         httpStep.body = httpStepDto.getBody();
         httpStep.method = httpStepDto.getMethod();
         httpStep.url = httpStepDto.getUrl();
@@ -101,6 +87,6 @@ public class HttpStepResource {
     @GET
     @Path("http")
     public List<HttpStepDto> getAllStepsForPlan(@PathParam("planId") long planId) {
-        return httpStepRepository.find("id.type.type=?1", StepType.HTTP).project(HttpStepDto.class).list();
+        return httpStepRepository.find("plan.id", planId).project(HttpStepDto.class).list();
     }
 }

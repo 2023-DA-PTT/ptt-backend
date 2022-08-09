@@ -6,13 +6,15 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 
 @RegisterForReflection
 public class HttpStepDto {
+    private Long id;
     private String name;
     private String description;
     private String method;
     private String url;
     private String body;
 
-    public HttpStepDto(String name, String description, String method, String url, String body) {
+    public HttpStepDto(Long id, String name, String description, String method, String url, String body) {
+        this.id = id;
         this.name = name;
         this.description = description;
         this.method = method;
@@ -22,7 +24,16 @@ public class HttpStepDto {
 
 
     public static HttpStepDto from(HttpStep httpStep) {
-        return new HttpStepDto(httpStep.id.getStep().name, httpStep.id.getStep().description, httpStep.method, httpStep.url, httpStep.body);
+        return new HttpStepDto(httpStep.id, httpStep.name, httpStep.description, httpStep.method, httpStep.url, httpStep.body);
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
 
