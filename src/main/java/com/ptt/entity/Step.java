@@ -5,9 +5,12 @@ import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import javax.persistence.*;
 import java.util.List;
 
+
 @Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public class Step extends PanacheEntityBase {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "step_id")
     public Long id;
     @ManyToOne
     public Plan plan;
@@ -15,12 +18,8 @@ public class Step extends PanacheEntityBase {
     public List<Step> nextSteps;
     public String name;
     public String description;
-    public String method;
-    public String url;
-    public String body;
     @OneToMany
     public List<InputArgument> inputArguments;
     @OneToMany
     public List<OutputArgument> outputArguments;
-
 }

@@ -1,31 +1,42 @@
 package com.ptt.entity.dto;
 
-import com.ptt.entity.Step;
+import com.ptt.entity.ScriptStep;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
 @RegisterForReflection
-public class StepDto {
-    private long id;
+public class ScriptStepDto {
+    private Long id;
     private String name;
     private String description;
+    private String script;
 
-    public StepDto(long id, String name, String description) {
+    public ScriptStepDto(Long id, String name, String description, String script) {
         this.id = id;
         this.name = name;
         this.description = description;
+        this.script = script;
     }
 
-    public static StepDto from(Step step) {
-        return new StepDto(step.id, step.name, step.description);
+
+    public static ScriptStepDto from(ScriptStep httpStep) {
+        return new ScriptStepDto(httpStep.id, httpStep.name, httpStep.description, httpStep.script);
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getScript() {
+        return script;
+    }
+
+    public void setScript(String script) {
+        this.script = script;
     }
 
     public String getName() {
@@ -43,5 +54,4 @@ public class StepDto {
     public void setDescription(String description) {
         this.description = description;
     }
-
 }

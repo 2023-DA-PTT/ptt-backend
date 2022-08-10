@@ -13,24 +13,29 @@ import java.util.ArrayList;
 
 @ApplicationScoped
 public class InitBean {
+    String BASE_URL = "http://ptt-test-environment-service:8080/";
+    
     @Inject
     UserRepository userRepository;
     @Inject
     PlanRepository planRepository;
     @Inject
-    StepRepository stepRepository;
-    @Inject
     OutputArgumentRepository outputArgumentRepository;
     @Inject
     InputArgumentRepository inputArgumentRepository;
     @Inject
+    StepRepository httpStepRepository;
+    @Inject
     StepParameterRelationRepository relationRepository;
     @Inject
     PlanRunRepository planRunRepository;
+    @Inject
+    ScriptStepRepository scriptStepRepository;
 
     @Transactional
     void onStart(@Observes StartupEvent ev) {
-        if(ProfileManager.getActiveProfile().equals("prod")) {
+
+        if (ProfileManager.getActiveProfile().equals("prod")) {
             return;
         }
         User defaultUser = new User();
@@ -44,59 +49,54 @@ public class InitBean {
         plan.user = defaultUser;
         planRepository.persist(plan);
 
-        Step start = new Step();
-        start.plan = plan;
-        start.name = "Sign Up";
-        start.description = "Creates an account";
-        start.method = "POST";
-        start.url = "http://ptt-test-environment-service:8080/sign-up";
-        start.body = "{\"username\": \"user\", \"password\": \"pw\"}";
-        start.nextSteps = new ArrayList<>();
-        stepRepository.persist(start);
+        HttpStep startHttp = new HttpStep();
+        startHttp.method = "POST";
+        startHttp.url = BASE_URL + "sign-up";
+        startHttp.body = "{\"username\": \"user\", \"password\": \"pw\"}";
+        startHttp.plan = plan;
+        startHttp.name = "Sign Up";
+        startHttp.description = "Creates an account";
+        startHttp.responseContentType = "json";
+        startHttp.nextSteps = new ArrayList<>();
+        httpStepRepository.persist(startHttp);
 
         OutputArgument outArgName = new OutputArgument();
         outArgName.name = "username";
-        outArgName.jsonLocation = "username";
-        outArgName.step = start;
+        outArgName.parameterLocation = "username";
+        outArgName.step = startHttp;
         outputArgumentRepository.persist(outArgName);
 
         OutputArgument outArgPw = new OutputArgument();
         outArgPw.name = "password";
-        outArgPw.jsonLocation = "password";
-        outArgPw.step = start;
+        outArgPw.parameterLocation = "password";
+        outArgPw.step = startHttp;
         outputArgumentRepository.persist(outArgPw);
 
-        plan.start = start;
+        plan.start = startHttp;
         planRepository.persist(plan);
 
-        Step login = new Step();
-        login.plan = plan;
-        login.name = "Login";
-        login.description = "Sign into an account ";
-        login.method = "POST";
-        login.url = "http://ptt-test-environment-service:8080/login";
-        login.body = "{\"username\": \"{{username}}\", \"password\": \"{{password}}\"}";
-        login.nextSteps = new ArrayList<>();
-        stepRepository.persist(login);
+        ScriptStep convertParameterToBodyStep = new ScriptStep();
+        convertParameterToBodyStep.name = "Parse Body";
+        convertParameterToBodyStep.description = "Takes the input arguments and parses them into a json body";
+        convertParameterToBodyStep.plan = plan;
+        convertParameterToBodyStep.script = "return {body: `{\"username\": \"${params.get(\"username\")}\", \"password\": \"${params.get(\"password\")}\"}`};";
+        scriptStepRepository.persist(convertParameterToBodyStep);
 
         InputArgument inArgName = new InputArgument();
         inArgName.name = "username";
-        inArgName.step = login;
+        inArgName.step = convertParameterToBodyStep;
         inputArgumentRepository.persist(inArgName);
 
         InputArgument inArgPw = new InputArgument();
         inArgPw.name = "password";
-        inArgPw.step = login;
+        inArgPw.step = convertParameterToBodyStep;
         inputArgumentRepository.persist(inArgPw);
 
-        OutputArgument outArgToken = new OutputArgument();
-        outArgToken.name = "token";
-        outArgToken.jsonLocation = "token";
-        outArgToken.step = login;
-        outputArgumentRepository.persist(outArgToken);
-
-        start.nextSteps.add(login);
-        stepRepository.persist(start);
+        OutputArgument outArgBody = new OutputArgument();
+        outArgBody.name = "body";
+        outArgBody.parameterLocation = "body";
+        outArgBody.step = convertParameterToBodyStep;
+        outputArgumentRepository.persist(outArgBody);
 
         StepParameterRelation nameParamRelation = new StepParameterRelation();
         nameParamRelation.fromArg = outArgName;
@@ -108,28 +108,59 @@ public class InitBean {
         pwParamRelation.toArg = inArgPw;
         relationRepository.persist(pwParamRelation);
 
-        Step sleep = new Step();
-        sleep.plan = plan;
-        sleep.name = "Sleep";
-        sleep.description = "Sleep for 4 seconds";
-        sleep.method = "GET";
-        sleep.url = "http://ptt-test-environment-service:8080/sleep/{token}/4";
-        sleep.body = "";
-        sleep.nextSteps = new ArrayList<>();
-        stepRepository.persist(sleep);
+        HttpStep loginHttp = new HttpStep();
+        loginHttp.method = "POST";
+        loginHttp.url = BASE_URL + "/login";
+        loginHttp.body = "{{body}}";
+        loginHttp.plan = plan;
+        loginHttp.name = "Login";
+        loginHttp.description = "Sign into an account";
+        loginHttp.responseContentType = "json";
+        loginHttp.nextSteps = new ArrayList<>();
+        httpStepRepository.persist(loginHttp);
+
+        InputArgument inArgBody = new InputArgument();
+        inArgBody.name = "body";
+        inArgBody.step = loginHttp;
+        inputArgumentRepository.persist(inArgBody);
+
+        OutputArgument outArgToken = new OutputArgument();
+        outArgToken.name = "token";
+        outArgToken.parameterLocation = "token";
+        outArgToken.step = loginHttp;
+        outputArgumentRepository.persist(outArgToken);
+
+        startHttp.nextSteps.add(loginHttp);
+        httpStepRepository.persist(startHttp);
+
+        StepParameterRelation bodyParamRelation = new StepParameterRelation();
+        bodyParamRelation.fromArg = outArgBody;
+        bodyParamRelation.toArg = inArgBody;
+        relationRepository.persist(bodyParamRelation);
+
+        HttpStep sleepHttp = new HttpStep();
+        sleepHttp.method = "GET";
+        sleepHttp.url = BASE_URL + "/sleep/{token}/4";
+        sleepHttp.body = "";
+        sleepHttp.plan = plan;
+        sleepHttp.name = "Sleep";
+        sleepHttp.description = "Sleep for 4 seconds";
+        sleepHttp.responseContentType = "json";
+        sleepHttp.nextSteps = new ArrayList<>();
+        httpStepRepository.persist(sleepHttp);
 
         InputArgument inArgToken = new InputArgument();
         inArgToken.name = "token";
-        inArgToken.step = sleep;
+        inArgToken.step = sleepHttp;
         inputArgumentRepository.persist(inArgToken);
-        
+
         StepParameterRelation tokenParamRelation = new StepParameterRelation();
         tokenParamRelation.fromArg = outArgToken;
         tokenParamRelation.toArg = inArgToken;
         relationRepository.persist(tokenParamRelation);
 
-        login.nextSteps.add(sleep);
-        stepRepository.persist(login);
+        loginHttp.nextSteps.add(sleepHttp);
+        httpStepRepository.persist(loginHttp);
 
         PlanRun planRun = new PlanRun();
         planRun.plan = plan;
