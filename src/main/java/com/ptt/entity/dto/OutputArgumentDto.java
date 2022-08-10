@@ -12,11 +12,11 @@ public class OutputArgumentDto {
     private String name;
     private String parameterLocation;
 
-    public OutputArgumentDto(long id, @ProjectedFieldName("step.id") long stepId, String name, String jsonLocation) {
+    public OutputArgumentDto(long id, @ProjectedFieldName("step.id") long stepId, String name, String parameterLocation) {
         this.id = id;
         this.stepId = stepId;
         this.name = name;
-        this.parameterLocation = jsonLocation;
+        this.parameterLocation = parameterLocation;
     }
 
     public static OutputArgumentDto from(OutputArgument outputArgument) {
