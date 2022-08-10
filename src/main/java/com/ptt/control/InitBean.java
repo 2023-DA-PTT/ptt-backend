@@ -50,24 +50,21 @@ public class InitBean {
         startHttp.plan = plan;
         startHttp.name = "Sign Up";
         startHttp.description = "Creates an account";
+        startHttp.responseContentType = "json";
         startHttp.nextSteps = new ArrayList<>();
         httpStepRepository.persist(startHttp);
 
         OutputArgument outArgName = new OutputArgument();
         outArgName.name = "username";
-        outArgName.jsonLocation = "username";
+        outArgName.parameterLocation = "username";
         outArgName.step = startHttp;
         outputArgumentRepository.persist(outArgName);
 
         OutputArgument outArgPw = new OutputArgument();
         outArgPw.name = "password";
-        outArgPw.jsonLocation = "password";
+        outArgPw.parameterLocation = "password";
         outArgPw.step = startHttp;
         outputArgumentRepository.persist(outArgPw);
-
-        startHttp.parameterMap.put(outArgName, "username");
-        startHttp.parameterMap.put(outArgPw, "password");
-        httpStepRepository.persist(startHttp);
 
         plan.start = startHttp;
         planRepository.persist(plan);
@@ -78,7 +75,8 @@ public class InitBean {
         loginHttp.body = "{\"username\": \"{{username}}\", \"password\": \"{{password}}\"}";
         loginHttp.plan = plan;
         loginHttp.name = "Login";
-        loginHttp.description = "Sign into an account ";
+        loginHttp.description = "Sign into an account";
+        loginHttp.responseContentType = "json";
         loginHttp.nextSteps = new ArrayList<>();
         httpStepRepository.persist(loginHttp);
         
@@ -94,12 +92,9 @@ public class InitBean {
         
         OutputArgument outArgToken = new OutputArgument();
         outArgToken.name = "token";
-        outArgToken.jsonLocation = "token";
+        outArgToken.parameterLocation = "token";
         outArgToken.step = loginHttp;
         outputArgumentRepository.persist(outArgToken);
-
-        loginHttp.parameterMap.put(outArgToken, "token");
-        httpStepRepository.persist(loginHttp);
 
         startHttp.nextSteps.add(loginHttp);
         httpStepRepository.persist(startHttp);
@@ -121,6 +116,7 @@ public class InitBean {
         sleepHttp.plan = plan;
         sleepHttp.name = "Sleep";
         sleepHttp.description = "Sleep for 4 seconds";
+        sleepHttp.responseContentType = "json";
         sleepHttp.nextSteps = new ArrayList<>();
         httpStepRepository.persist(sleepHttp);
 

@@ -10,17 +10,17 @@ public class OutputArgumentDto {
     private long stepId;
     private long id;
     private String name;
-    private String jsonLocation;
+    private String parameterLocation;
 
     public OutputArgumentDto(long id, @ProjectedFieldName("step.id") long stepId, String name, String jsonLocation) {
         this.id = id;
         this.stepId = stepId;
         this.name = name;
-        this.jsonLocation = jsonLocation;
+        this.parameterLocation = jsonLocation;
     }
 
     public static OutputArgumentDto from(OutputArgument outputArgument) {
-        return new OutputArgumentDto(outputArgument.id, outputArgument.step.id, outputArgument.name, outputArgument.jsonLocation);
+        return new OutputArgumentDto(outputArgument.id, outputArgument.step.id, outputArgument.name, outputArgument.parameterLocation);
     }
 
     public long getStepId() {
@@ -48,11 +48,11 @@ public class OutputArgumentDto {
     }
 
     public String getJsonLocation() {
-        return jsonLocation;
+        return parameterLocation;
     }
 
     public void setJsonLocation(String jsonLocation) {
-        this.jsonLocation = jsonLocation;
+        this.parameterLocation = jsonLocation;
     }
 
     

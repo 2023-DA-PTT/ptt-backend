@@ -12,19 +12,21 @@ public class HttpStepDto {
     private String method;
     private String url;
     private String body;
+    private String responseContentType;
 
-    public HttpStepDto(Long id, String name, String description, String method, String url, String body) {
+    public HttpStepDto(Long id, String name, String description, String method, String url, String body, String responseContentType) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.method = method;
         this.url = url;
         this.body = body;
+        this.responseContentType = responseContentType;
     }
 
 
     public static HttpStepDto from(HttpStep httpStep) {
-        return new HttpStepDto(httpStep.id, httpStep.name, httpStep.description, httpStep.method, httpStep.url, httpStep.body);
+        return new HttpStepDto(httpStep.id, httpStep.name, httpStep.description, httpStep.method, httpStep.url, httpStep.body, httpStep.responseContentType);
     }
 
     public Long getId() {
@@ -80,6 +82,16 @@ public class HttpStepDto {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+
+    public String getResponseContentType() {
+        return responseContentType;
+    }
+
+
+    public void setResponseContentType(String responseContentType) {
+        this.responseContentType = responseContentType;
     }
 
 }

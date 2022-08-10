@@ -12,5 +12,5 @@ public class OutputArgument extends PanacheEntityBase {
     @ManyToOne
     public Step step;
     public String name;
-    public String jsonLocation;
+    public String parameterLocation;
 }
