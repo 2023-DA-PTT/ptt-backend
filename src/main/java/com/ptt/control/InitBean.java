@@ -27,6 +27,8 @@ public class InitBean {
     StepParameterRelationRepository relationRepository;
     @Inject
     PlanRunRepository planRunRepository;
+    @Inject
+    ScriptStepRepository scriptStepRepository;
     @Transactional
     void onStart(@Observes StartupEvent ev) {
         if(ProfileManager.getActiveProfile().equals("prod")) {
@@ -69,10 +71,43 @@ public class InitBean {
         plan.start = startHttp;
         planRepository.persist(plan);
 
+        ScriptStep convertParameterToBodyStep = new ScriptStep();
+        convertParameterToBodyStep.name = "Parse Body";
+        convertParameterToBodyStep.description = "Takes the input arguments and parses them into a json body";
+        convertParameterToBodyStep.plan = plan;
+        convertParameterToBodyStep.script = "function convert(username, password) {return {body: `{\"username\": \"${username}\", \"password\": \"${password}\"}`};}";
+        scriptStepRepository.persist(convertParameterToBodyStep);
+
+        InputArgument inArgName = new InputArgument();
+        inArgName.name = "username";
+        inArgName.step = convertParameterToBodyStep;
+        inputArgumentRepository.persist(inArgName);
+        
+        InputArgument inArgPw = new InputArgument();
+        inArgPw.name = "password";
+        inArgPw.step = convertParameterToBodyStep;
+        inputArgumentRepository.persist(inArgPw);
+
+        OutputArgument outArgBody = new OutputArgument();
+        outArgBody.name = "body";
+        outArgBody.parameterLocation = "";
+        outArgBody.step = convertParameterToBodyStep;
+        outputArgumentRepository.persist(outArgBody);
+
+        StepParameterRelation nameParamRelation = new StepParameterRelation();
+        nameParamRelation.fromArg = outArgName;
+        nameParamRelation.toArg = inArgName;
+        relationRepository.persist(nameParamRelation);
+
+        StepParameterRelation pwParamRelation = new StepParameterRelation();
+        pwParamRelation.fromArg = outArgPw;
+        pwParamRelation.toArg = inArgPw;
+        relationRepository.persist(pwParamRelation);
+
         HttpStep loginHttp = new HttpStep();
         loginHttp.method = "POST";
         loginHttp.url = "http://ptt-test-environment-service:8080/login";
-        loginHttp.body = "{\"username\": \"{{username}}\", \"password\": \"{{password}}\"}";
+        loginHttp.body = "{{body}}";
         loginHttp.plan = plan;
         loginHttp.name = "Login";
         loginHttp.description = "Sign into an account";
@@ -80,15 +115,10 @@ public class InitBean {
         loginHttp.nextSteps = new ArrayList<>();
         httpStepRepository.persist(loginHttp);
         
-        InputArgument inArgName = new InputArgument();
-        inArgName.name = "username";
-        inArgName.step = loginHttp;
-        inputArgumentRepository.persist(inArgName);
-        
-        InputArgument inArgPw = new InputArgument();
-        inArgPw.name = "password";
-        inArgPw.step = loginHttp;
-        inputArgumentRepository.persist(inArgPw);
+        InputArgument inArgBody = new InputArgument();
+        inArgBody.name = "body";
+        inArgBody.step = loginHttp;
+        inputArgumentRepository.persist(inArgBody);
         
         OutputArgument outArgToken = new OutputArgument();
         outArgToken.name = "token";
@@ -99,15 +129,10 @@ public class InitBean {
         startHttp.nextSteps.add(loginHttp);
         httpStepRepository.persist(startHttp);
         
-        StepParameterRelation nameParamRelation = new StepParameterRelation();
-        nameParamRelation.fromArg = outArgName;
-        nameParamRelation.toArg = inArgName;
-        relationRepository.persist(nameParamRelation);
-
-        StepParameterRelation pwParamRelation = new StepParameterRelation();
-        pwParamRelation.fromArg = outArgPw;
-        pwParamRelation.toArg = inArgPw;
-        relationRepository.persist(pwParamRelation);
+        StepParameterRelation bodyParamRelation = new StepParameterRelation();
+        bodyParamRelation.fromArg = outArgBody;
+        bodyParamRelation.toArg = inArgBody;
+        relationRepository.persist(bodyParamRelation);
 
         HttpStep sleepHttp = new HttpStep();
         sleepHttp.method = "GET";
