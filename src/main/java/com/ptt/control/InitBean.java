@@ -13,6 +13,8 @@ import java.util.ArrayList;
 
 @ApplicationScoped
 public class InitBean {
+    String BASE_URL = "http://ptt-test-environment-service:8080/";
+    
     @Inject
     UserRepository userRepository;
     @Inject
@@ -29,9 +31,11 @@ public class InitBean {
     PlanRunRepository planRunRepository;
     @Inject
     ScriptStepRepository scriptStepRepository;
+
     @Transactional
     void onStart(@Observes StartupEvent ev) {
-        if(ProfileManager.getActiveProfile().equals("prod")) {
+
+        if (ProfileManager.getActiveProfile().equals("prod")) {
             return;
         }
         User defaultUser = new User();
@@ -47,7 +51,7 @@ public class InitBean {
 
         HttpStep startHttp = new HttpStep();
         startHttp.method = "POST";
-        startHttp.url = "http://ptt-test-environment-service:8080/sign-up";
+        startHttp.url = BASE_URL + "sign-up";
         startHttp.body = "{\"username\": \"user\", \"password\": \"pw\"}";
         startHttp.plan = plan;
         startHttp.name = "Sign Up";
@@ -82,7 +86,7 @@ public class InitBean {
         inArgName.name = "username";
         inArgName.step = convertParameterToBodyStep;
         inputArgumentRepository.persist(inArgName);
-        
+
         InputArgument inArgPw = new InputArgument();
         inArgPw.name = "password";
         inArgPw.step = convertParameterToBodyStep;
@@ -106,7 +110,7 @@ public class InitBean {
 
         HttpStep loginHttp = new HttpStep();
         loginHttp.method = "POST";
-        loginHttp.url = "http://ptt-test-environment-service:8080/login";
+        loginHttp.url = BASE_URL + "/login";
         loginHttp.body = "{{body}}";
         loginHttp.plan = plan;
         loginHttp.name = "Login";
@@ -114,12 +118,12 @@ public class InitBean {
         loginHttp.responseContentType = "json";
         loginHttp.nextSteps = new ArrayList<>();
         httpStepRepository.persist(loginHttp);
-        
+
         InputArgument inArgBody = new InputArgument();
         inArgBody.name = "body";
         inArgBody.step = loginHttp;
         inputArgumentRepository.persist(inArgBody);
-        
+
         OutputArgument outArgToken = new OutputArgument();
         outArgToken.name = "token";
         outArgToken.parameterLocation = "token";
@@ -128,7 +132,7 @@ public class InitBean {
 
         startHttp.nextSteps.add(loginHttp);
         httpStepRepository.persist(startHttp);
-        
+
         StepParameterRelation bodyParamRelation = new StepParameterRelation();
         bodyParamRelation.fromArg = outArgBody;
         bodyParamRelation.toArg = inArgBody;
@@ -136,7 +140,7 @@ public class InitBean {
 
         HttpStep sleepHttp = new HttpStep();
         sleepHttp.method = "GET";
-        sleepHttp.url = "http://ptt-test-environment-service:8080/sleep/{token}/4";
+        sleepHttp.url = BASE_URL + "/sleep/{token}/4";
         sleepHttp.body = "";
         sleepHttp.plan = plan;
         sleepHttp.name = "Sleep";

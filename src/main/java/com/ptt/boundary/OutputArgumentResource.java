@@ -37,7 +37,7 @@ public class OutputArgumentResource {
         OutputArgument outputArgument = new OutputArgument();
         outputArgument.step = step;
         outputArgument.name = outputArgumentDto.getName();
-        outputArgument.parameterLocation = outputArgumentDto.getJsonLocation();
+        outputArgument.parameterLocation = outputArgumentDto.getParameterLocation();
         outputArgumentRepository.persist(outputArgument);
         return Response.ok(OutputArgumentDto.from(outputArgument)).build();
     }

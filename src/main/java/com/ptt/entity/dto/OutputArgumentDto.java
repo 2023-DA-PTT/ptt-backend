@@ -47,13 +47,11 @@ public class OutputArgumentDto {
         this.name = name;
     }
 
-    public String getJsonLocation() {
+    public String getParameterLocation() {
         return parameterLocation;
     }
 
-    public void setJsonLocation(String jsonLocation) {
-        this.parameterLocation = jsonLocation;
+    public void setParameterLocation(String parameterLocation) {
+        this.parameterLocation = parameterLocation;
     }
-
-    
 }
