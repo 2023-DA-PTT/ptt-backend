@@ -79,7 +79,7 @@ public class InitBean {
         convertParameterToBodyStep.name = "Parse Body";
         convertParameterToBodyStep.description = "Takes the input arguments and parses them into a json body";
         convertParameterToBodyStep.plan = plan;
-        convertParameterToBodyStep.script = "function convert(username, password) {return {body: `{\"username\": \"${username}\", \"password\": \"${password}\"}`};}";
+        convertParameterToBodyStep.script = "return {body: `{\"username\": \"${params.get(\"username\")}\", \"password\": \"${params.get(\"password\")}\"}`};";
         scriptStepRepository.persist(convertParameterToBodyStep);
 
         InputArgument inArgName = new InputArgument();
@@ -94,7 +94,7 @@ public class InitBean {
 
         OutputArgument outArgBody = new OutputArgument();
         outArgBody.name = "body";
-        outArgBody.parameterLocation = "";
+        outArgBody.parameterLocation = "body";
         outArgBody.step = convertParameterToBodyStep;
         outputArgumentRepository.persist(outArgBody);
 
