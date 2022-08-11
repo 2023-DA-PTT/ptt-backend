@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 @ApplicationScoped
 public class InitBean {
-    String BASE_URL = "http://ptt-test-environment-service:8080/";
+    String BASE_URL = "http://ptt-test-environment-service:8080";
     
     @Inject
     UserRepository userRepository;
@@ -51,7 +51,7 @@ public class InitBean {
 
         HttpStep startHttp = new HttpStep();
         startHttp.method = "POST";
-        startHttp.url = BASE_URL + "sign-up";
+        startHttp.url = BASE_URL + "/sign-up";
         startHttp.body = "{\"username\": \"user\", \"password\": \"pw\"}";
         startHttp.plan = plan;
         startHttp.name = "Sign Up";
