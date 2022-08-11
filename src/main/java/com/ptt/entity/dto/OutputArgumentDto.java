@@ -1,6 +1,10 @@
 package com.ptt.entity.dto;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+
 import com.ptt.entity.OutputArgument;
+import com.ptt.entity.OutputType;
 
 import io.quarkus.hibernate.orm.panache.common.ProjectedFieldName;
 import io.quarkus.runtime.annotations.RegisterForReflection;
@@ -11,16 +15,27 @@ public class OutputArgumentDto {
     private long id;
     private String name;
     private String parameterLocation;
+    @Enumerated(EnumType.ORDINAL)
+    private OutputType outputType;
 
-    public OutputArgumentDto(long id, @ProjectedFieldName("step.id") long stepId, String name, String parameterLocation) {
+    public OutputArgumentDto(long id, @ProjectedFieldName("step.id") long stepId, String name, String parameterLocation, OutputType outputType) {
         this.id = id;
         this.stepId = stepId;
         this.name = name;
         this.parameterLocation = parameterLocation;
+        this.outputType = outputType;
     }
 
     public static OutputArgumentDto from(OutputArgument outputArgument) {
-        return new OutputArgumentDto(outputArgument.id, outputArgument.step.id, outputArgument.name, outputArgument.parameterLocation);
+        return new OutputArgumentDto(outputArgument.id, outputArgument.step.id, outputArgument.name, outputArgument.parameterLocation, outputArgument.outputType);
+    }
+
+    public OutputType getOutputType() {
+        return outputType;
+    }
+
+    public void setOutputType(OutputType outputType) {
+        this.outputType = outputType;
     }
 
     public long getStepId() {

@@ -52,6 +52,8 @@ public class HttpStepResource {
         httpStep.body = httpStepDto.getBody();
         httpStep.method = httpStepDto.getMethod();
         httpStep.url = httpStepDto.getUrl();
+        httpStep.responseContentType = httpStepDto.getResponseContentType();
+        httpStep.contentType = httpStepDto.getContentType();
         httpStepRepository.persist(httpStep);
 
         return Response.ok(HttpStepDto.from(httpStep)).build();
@@ -79,6 +81,8 @@ public class HttpStepResource {
         httpStep.body = httpStepDto.getBody();
         httpStep.method = httpStepDto.getMethod();
         httpStep.url = httpStepDto.getUrl();
+        httpStep.responseContentType = httpStepDto.getResponseContentType();
+        httpStep.contentType = httpStepDto.getContentType();
         httpStepRepository.persist(httpStep);
 
         return Response.ok(HttpStepDto.from(httpStep)).build();

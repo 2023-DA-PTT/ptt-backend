@@ -7,5 +7,6 @@ public class HttpStep extends Step {
     public String method;
     public String url;
     public String body;
-    public String responseContentType;
+    public RequestContentType responseContentType;
+    public RequestContentType contentType; 
 }

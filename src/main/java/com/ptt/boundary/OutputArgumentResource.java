@@ -38,6 +38,7 @@ public class OutputArgumentResource {
         outputArgument.step = step;
         outputArgument.name = outputArgumentDto.getName();
         outputArgument.parameterLocation = outputArgumentDto.getParameterLocation();
+        outputArgument.outputType = outputArgumentDto.getOutputType();
         outputArgumentRepository.persist(outputArgument);
         return Response.ok(OutputArgumentDto.from(outputArgument)).build();
     }
