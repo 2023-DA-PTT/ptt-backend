@@ -71,7 +71,7 @@ public class InitBean {
         OutputArgument outArgPw = new OutputArgument();
         outArgPw.name = "password";
         outArgPw.parameterLocation = "password";
-        outArgName.outputType = OutputType.PLAIN_TEXT;
+        outArgPw.outputType = OutputType.PLAIN_TEXT;
         outArgPw.step = startHttp;
         outputArgumentRepository.persist(outArgPw);
 
@@ -98,7 +98,7 @@ public class InitBean {
         OutputArgument outArgBody = new OutputArgument();
         outArgBody.name = "body";
         outArgBody.parameterLocation = "body";
-        outArgName.outputType = OutputType.PLAIN_TEXT;
+        outArgBody.outputType = OutputType.PLAIN_TEXT;
         outArgBody.step = convertParameterToBodyStep;
         outputArgumentRepository.persist(outArgBody);
 
@@ -132,7 +132,7 @@ public class InitBean {
         OutputArgument outArgToken = new OutputArgument();
         outArgToken.name = "token";
         outArgToken.parameterLocation = "token";
-        outArgName.outputType = OutputType.PLAIN_TEXT;
+        outArgToken.outputType = OutputType.PLAIN_TEXT;
         outArgToken.step = loginHttp;
         outputArgumentRepository.persist(outArgToken);
 
