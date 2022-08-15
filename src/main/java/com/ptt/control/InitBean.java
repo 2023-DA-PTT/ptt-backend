@@ -36,7 +36,7 @@ public class InitBean {
     void onStart(@Observes StartupEvent ev) {
 
         if (ProfileManager.getActiveProfile().equals("prod")) {
-            return;
+            //return;
         }
         User defaultUser = new User();
         defaultUser.username = "default";
