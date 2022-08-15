@@ -49,6 +49,30 @@ public class InitBean {
         plan.user = defaultUser;
         planRepository.persist(plan);
 
+        ScriptStep createUser = new ScriptStep();
+        createUser.name = "Create User";
+        createUser.description = "Create random user";
+        createUser.plan = plan;
+        createUser.script = "return {username: \"user\" + Math.floor(Math.random()*10000), password: \"password\"};";
+        scriptStepRepository.persist(createUser);
+
+        OutputArgument outArgNameSetup = new OutputArgument();
+        outArgNameSetup.name = "username";
+        outArgNameSetup.parameterLocation = "username";
+        outArgNameSetup.outputType = OutputType.PLAIN_TEXT;
+        outArgNameSetup.step = createUser;
+        outputArgumentRepository.persist(outArgNameSetup);
+
+        OutputArgument outArgPwSetup = new OutputArgument();
+        outArgPwSetup.name = "password";
+        outArgPwSetup.parameterLocation = "password";
+        outArgPwSetup.outputType = OutputType.PLAIN_TEXT;
+        outArgPwSetup.step = createUser;
+        outputArgumentRepository.persist(outArgPwSetup);
+
+        plan.start = createUser;
+        planRepository.persist(plan);
+
         HttpStep startHttp = new HttpStep();
         startHttp.method = "POST";
         startHttp.url = BASE_URL + "/sign-up";
@@ -60,6 +84,16 @@ public class InitBean {
         startHttp.contentType = RequestContentType.APPLICATION_JSON;
         startHttp.nextSteps = new ArrayList<>();
         httpStepRepository.persist(startHttp);
+
+        InputArgument inArgNameSignIn = new InputArgument();
+        inArgNameSignIn.name = "username";
+        inArgNameSignIn.step = startHttp;
+        inputArgumentRepository.persist(inArgNameSignIn);
+
+        InputArgument inArgPwSignIn = new InputArgument();
+        inArgPwSignIn.name = "password";
+        inArgPwSignIn.step = startHttp;
+        inputArgumentRepository.persist(inArgPwSignIn);
 
         OutputArgument outArgName = new OutputArgument();
         outArgName.name = "username";
@@ -75,8 +109,15 @@ public class InitBean {
         outArgPw.step = startHttp;
         outputArgumentRepository.persist(outArgPw);
 
-        plan.start = startHttp;
-        planRepository.persist(plan);
+        StepParameterRelation nameParamRelationSetup = new StepParameterRelation();
+        nameParamRelationSetup.fromArg = outArgNameSetup;
+        nameParamRelationSetup.toArg = inArgNameSignIn;
+        relationRepository.persist(nameParamRelationSetup);
+
+        StepParameterRelation pwParamRelationSetup = new StepParameterRelation();
+        pwParamRelationSetup.fromArg = outArgPwSetup;
+        pwParamRelationSetup.toArg = inArgPwSignIn;
+        relationRepository.persist(pwParamRelationSetup);
 
         ScriptStep convertParameterToBodyStep = new ScriptStep();
         convertParameterToBodyStep.name = "Parse Body";
