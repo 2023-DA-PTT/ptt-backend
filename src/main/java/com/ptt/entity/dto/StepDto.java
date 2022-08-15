@@ -9,15 +9,25 @@ public class StepDto {
     private long id;
     private String name;
     private String description;
+    private String type;
 
-    public StepDto(long id, String name, String description) {
+    public StepDto(long id, String name, String description, String type) {
         this.id = id;
         this.name = name;
         this.description = description;
+        this.type = type;
     }
 
     public static StepDto from(Step step) {
-        return new StepDto(step.id, step.name, step.description);
+        return new StepDto(step.id, step.name, step.description, step.type);
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public long getId() {

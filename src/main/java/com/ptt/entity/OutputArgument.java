@@ -13,4 +13,5 @@ public class OutputArgument extends PanacheEntityBase {
     public Step step;
     public String name;
     public String parameterLocation;
+    public OutputType outputType;
 }
