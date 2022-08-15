@@ -15,9 +15,9 @@ spec:
     spec:
       serviceAccountName: ptt-backend
       containers:
-        - name: backend
-          image: ghcr.io/2023-da-ptt/ptt-backend:latest
-          #imagePullPolicy: Always
+        - name: {{ .Chart.Name }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           resources:
             requests:
               memory: "1024Mi"
