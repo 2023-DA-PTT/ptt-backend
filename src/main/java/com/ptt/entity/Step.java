@@ -17,14 +17,14 @@ public class Step extends PanacheEntityBase {
     public Long id;
     @ManyToOne
     public Plan plan;
-    @ManyToMany
-    public List<Step> nextSteps = new ArrayList<>();
+    @ManyToMany(mappedBy = "fromStep")
+    public List<NextStep> nextSteps = new ArrayList<>();
     public String name;
     public String description;
     @Column(name = "step_type", insertable = false, updatable = false)
     public String type;
-    @OneToMany
+    @OneToMany(mappedBy = "step")
     public List<InputArgument> inputArguments = new ArrayList<>();
-    @OneToMany
+    @OneToMany(mappedBy = "step")
     public List<OutputArgument> outputArguments = new ArrayList<>();
 }
