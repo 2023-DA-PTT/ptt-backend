@@ -5,6 +5,8 @@ import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
 import com.ptt.entity.dto.PlanRunInstructionDto;
 
 import io.fabric8.kubernetes.api.model.ContainerBuilder;
@@ -16,7 +18,6 @@ import io.fabric8.kubernetes.api.model.PodTemplateSpecBuilder;
 import io.fabric8.kubernetes.api.model.batch.v1.JobBuilder;
 import io.fabric8.kubernetes.api.model.batch.v1.JobSpecBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.quarkus.runtime.configuration.ProfileManager;
 
 @ApplicationScoped
 public class PttClientManager {
@@ -28,6 +29,9 @@ public class PttClientManager {
             startClient(planRunId, dto);
         }
     }
+
+    @ConfigProperty(name = "pttclientmanager.pull-policy")
+    String clientPullPolicy = "Always";
 
     public void startClient(long planRunId, PlanRunInstructionDto planRunInstructionDto) {
         kubernetesClient.batch().v1().jobs().inNamespace("ptt").create(
@@ -56,8 +60,7 @@ public class PttClientManager {
                                 .build()
                             )
                             .withImage("ghcr.io/2023-da-ptt/ptt-client:latest")
-                            .withImagePullPolicy(
-                                ProfileManager.getActiveProfile().equals("prod") ? "Always" : "IfNotPresent")
+                            .withImagePullPolicy(clientPullPolicy)
                             .build()
                         ).withImagePullSecrets(
                             new LocalObjectReferenceBuilder()
