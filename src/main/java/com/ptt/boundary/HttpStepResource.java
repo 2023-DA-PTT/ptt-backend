@@ -89,6 +89,27 @@ public class HttpStepResource {
     }
 
     @GET
+    @Path("{stepId}/http")
+    @Transactional
+    public Response getHttpStepForPlan(
+            @PathParam("planId") long planId,
+            @PathParam("stepId") long stepId) {
+        Plan plan = planRepository.findById(planId);
+        if(plan == null) {
+            return Response.status(400).build();
+        }
+        HttpStep httpStep = httpStepRepository
+                .find("id=?1", stepId).firstResult();
+        if(httpStep == null) {
+            return Response.status(400).build();
+        }
+
+        return Response.ok(HttpStepDto.from(httpStep)).build();
+    }
+
+
+
+    @GET
     @Path("http")
     public List<HttpStepDto> getAllStepsForPlan(@PathParam("planId") long planId) {
         return httpStepRepository.find("plan.id", planId).project(HttpStepDto.class).list();
