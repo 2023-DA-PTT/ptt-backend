@@ -41,6 +41,25 @@ public class InputArgumentResource {
         return Response.ok(InputArgumentDto.from(inputArgument)).status(201).build();
     }
 
+    @PATCH
+    @Transactional
+    public Response patchInputArgumentForStep(
+            @PathParam("planId") long planId,
+            @PathParam("stepId") long stepId,
+            InputArgumentDto inputArgumentDto) {
+        Step step = stepRepository.findById(stepId);
+        if(step == null) {
+            return Response.status(400).build();
+        }
+        InputArgument arg = inputArgumentRepository.findById(inputArgumentDto.getId());
+        if(arg == null) {
+            return Response.status(400).build();
+        }
+        arg.name = inputArgumentDto.getName();
+        inputArgumentRepository.persist(arg);
+        return Response.ok(InputArgumentDto.from(arg)).status(200).build();
+    }
+
     @GET
     public List<InputArgumentDto> getAllInputArgumentForStep(
             @PathParam("planId") long planId,

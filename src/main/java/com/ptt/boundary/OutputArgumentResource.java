@@ -2,8 +2,10 @@ package com.ptt.boundary;
 
 import com.ptt.control.OutputArgumentRepository;
 import com.ptt.control.StepRepository;
+import com.ptt.entity.InputArgument;
 import com.ptt.entity.OutputArgument;
 import com.ptt.entity.Step;
+import com.ptt.entity.dto.InputArgumentDto;
 import com.ptt.entity.dto.OutputArgumentDto;
 
 import javax.inject.Inject;
@@ -41,6 +43,27 @@ public class OutputArgumentResource {
         outputArgument.outputType = outputArgumentDto.getOutputType();
         outputArgumentRepository.persist(outputArgument);
         return Response.ok(OutputArgumentDto.from(outputArgument)).build();
+    }
+
+    @PATCH
+    @Transactional
+    public Response patchOutputArgumentForStep(
+            @PathParam("planId") long planId,
+            @PathParam("stepId") long stepId,
+            OutputArgumentDto outputArgumentDto) {
+        Step step = stepRepository.findById(stepId);
+        if(step == null) {
+            return Response.status(400).build();
+        }
+        OutputArgument arg = outputArgumentRepository.findById(outputArgumentDto.getId());
+        if(arg == null) {
+            return Response.status(400).build();
+        }
+        arg.name = outputArgumentDto.getName();
+        arg.outputType = outputArgumentDto.getOutputType();
+        arg.parameterLocation = outputArgumentDto.getParameterLocation();
+        outputArgumentRepository.persist(arg);
+        return Response.ok(OutputArgumentDto.from(arg)).status(200).build();
     }
 
     @GET
