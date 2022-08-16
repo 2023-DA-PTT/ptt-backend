@@ -268,7 +268,7 @@ public class InitBean {
         NextStep loginNextStepMulti = new NextStep();
         loginNextStepMulti.fromStep = loginHttp;
         loginNextStepMulti.toStep = createInputForMultiPart;
-        loginNextStepMulti.repeatAmount = 1;
+        loginNextStepMulti.repeatAmount = 3;
         nextStepRepository.persist(loginNextStepMulti);
 
         loginHttp.nextSteps.add(loginNextStepMulti);
