@@ -81,6 +81,25 @@ public class ScriptStepResource {
     }
 
     @GET
+    @Path("{stepId}/script")
+    @Transactional
+    public Response getScriptStepForPlan(
+            @PathParam("planId") long planId,
+            @PathParam("stepId") long stepId) {
+        Plan plan = planRepository.findById(planId);
+        if(plan == null) {
+            return Response.status(400).build();
+        }
+        ScriptStep scriptStep = scriptStepRepository
+            .find("id=?1", stepId).firstResult();
+        if(scriptStep == null) {
+            return Response.status(400).build();
+        }
+
+        return Response.ok(ScriptStepDto.from(scriptStep)).build();
+    }
+
+    @GET
     @Path("script")
     public List<ScriptStepDto> getAllStepsForPlan(@PathParam("planId") long planId) {
         return scriptStepRepository.find("plan.id", planId).project(ScriptStepDto.class).list();
