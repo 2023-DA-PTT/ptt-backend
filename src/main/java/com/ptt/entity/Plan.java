@@ -15,7 +15,7 @@ public class Plan extends PanacheEntityBase {
     public Step start;
     @ManyToOne
     public User user;
-    @OneToMany
+    @OneToMany(mappedBy = "plan")
     public List<Step> steps;
     public String name;
     public String description;

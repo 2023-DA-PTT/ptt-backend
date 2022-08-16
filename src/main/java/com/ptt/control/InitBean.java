@@ -29,6 +29,8 @@ public class InitBean {
     PlanRunRepository planRunRepository;
     @Inject
     ScriptStepRepository scriptStepRepository;
+    @Inject
+    NextStepRepository nextStepRepository;
 
     @Transactional
     void onStart(@Observes StartupEvent ev) {
@@ -51,11 +53,18 @@ public class InitBean {
         createUser.name = "Create User";
         createUser.description = "Create random user";
         createUser.plan = plan;
-        createUser.script = "return {username: \"user\" + Math.floor(Math.random()*10000), password: \"password\"};";
+        createUser.script = "return {username: \"user\" + Math.floor(Math.random()*10000), password: \"password\", random: \"random\"};";
         scriptStepRepository.persist(createUser);
 
+        OutputArgument outArgRandomSetup = new OutputArgument();
+        outArgRandomSetup.name = "random";
+        outArgRandomSetup.parameterLocation = "random";
+        outArgRandomSetup.outputType = OutputType.PLAIN_TEXT;
+        outArgRandomSetup.step = createUser;
+        outputArgumentRepository.persist(outArgRandomSetup);
+
         OutputArgument outArgNameSetup = new OutputArgument();
-        outArgNameSetup.name = "username";
+        outArgNameSetup.name = "uname";
         outArgNameSetup.parameterLocation = "username";
         outArgNameSetup.outputType = OutputType.PLAIN_TEXT;
         outArgNameSetup.step = createUser;
@@ -116,8 +125,14 @@ public class InitBean {
         pwParamRelationSetup.toArg = inArgPwSignIn;
         relationRepository.persist(pwParamRelationSetup);
 
-        createUser.nextSteps.add(startHttp);
-        scriptStepRepository.persist(createUser);        
+        NextStep createUserNextStep = new NextStep();
+        createUserNextStep.fromStep = createUser;
+        createUserNextStep.toStep = startHttp;
+        createUserNextStep.repeatAmount = 1;
+        nextStepRepository.persist(createUserNextStep);
+
+        createUser.nextSteps.add(createUserNextStep);
+        scriptStepRepository.persist(createUser);
 
         ScriptStep convertParameterToBodyStep = new ScriptStep();
         convertParameterToBodyStep.name = "Parse Body";
@@ -152,8 +167,14 @@ public class InitBean {
         pwParamRelation.fromArg = outArgPw;
         pwParamRelation.toArg = inArgPw;
         relationRepository.persist(pwParamRelation);
+        
+        NextStep startNextStep = new NextStep();
+        startNextStep.fromStep = startHttp;
+        startNextStep.toStep = convertParameterToBodyStep;
+        startNextStep.repeatAmount = 1;
+        nextStepRepository.persist(startNextStep);
 
-        startHttp.nextSteps.add(convertParameterToBodyStep);
+        startHttp.nextSteps.add(startNextStep);
         httpStepRepository.persist(startHttp);     
 
         HttpStep loginHttp = new HttpStep();
@@ -184,7 +205,13 @@ public class InitBean {
         bodyParamRelation.toArg = inArgBody;
         relationRepository.persist(bodyParamRelation);
 
-        convertParameterToBodyStep.nextSteps.add(loginHttp);
+        NextStep convertNextStep = new NextStep();
+        convertNextStep.fromStep = convertParameterToBodyStep;
+        convertNextStep.toStep = loginHttp;
+        convertNextStep.repeatAmount = 1;
+        nextStepRepository.persist(convertNextStep);
+
+        convertParameterToBodyStep.nextSteps.add(convertNextStep);
         scriptStepRepository.persist(convertParameterToBodyStep);
         
         HttpStep sleepHttp = new HttpStep();
@@ -208,7 +235,13 @@ public class InitBean {
         tokenParamRelation.toArg = inArgToken;
         relationRepository.persist(tokenParamRelation);
 
-        loginHttp.nextSteps.add(sleepHttp);
+        NextStep loginNextStep = new NextStep();
+        loginNextStep.fromStep = loginHttp;
+        loginNextStep.toStep = sleepHttp;
+        loginNextStep.repeatAmount = 1;
+        nextStepRepository.persist(loginNextStep);
+
+        loginHttp.nextSteps.add(loginNextStep);
         httpStepRepository.persist(loginHttp);
 
         ScriptStep createInputForMultiPart = new ScriptStep();
@@ -232,7 +265,13 @@ public class InitBean {
         outArgFileInputForMulti.step = createInputForMultiPart;
         outputArgumentRepository.persist(outArgFileInputForMulti);
 
-        loginHttp.nextSteps.add(createInputForMultiPart);
+        NextStep loginNextStepMulti = new NextStep();
+        loginNextStepMulti.fromStep = loginHttp;
+        loginNextStepMulti.toStep = createInputForMultiPart;
+        loginNextStepMulti.repeatAmount = 1;
+        nextStepRepository.persist(loginNextStepMulti);
+
+        loginHttp.nextSteps.add(loginNextStepMulti);
         httpStepRepository.persist(loginHttp);
 
         HttpStep multiPartHttpStep = new HttpStep();
@@ -266,7 +305,13 @@ public class InitBean {
         fileContentParamRelation.toArg = inArgMultipartFile;
         relationRepository.persist(fileContentParamRelation);
 
-        createInputForMultiPart.nextSteps.add(multiPartHttpStep);
+        NextStep createInputNextStep = new NextStep();
+        createInputNextStep.fromStep = createInputForMultiPart;
+        createInputNextStep.toStep = multiPartHttpStep;
+        createInputNextStep.repeatAmount = 1;
+        nextStepRepository.persist(createInputNextStep);
+
+        createInputForMultiPart.nextSteps.add(createInputNextStep);
         scriptStepRepository.persist(createInputForMultiPart);
 
         PlanRun planRun = new PlanRun();
