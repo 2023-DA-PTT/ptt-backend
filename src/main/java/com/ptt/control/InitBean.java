@@ -9,8 +9,6 @@ import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
-import java.util.ArrayList;
-
 @ApplicationScoped
 public class InitBean {
     String BASE_URL = "http://ptt-test-environment-service:8080";
@@ -76,13 +74,12 @@ public class InitBean {
         HttpStep startHttp = new HttpStep();
         startHttp.method = "POST";
         startHttp.url = BASE_URL + "/sign-up";
-        startHttp.body = "{\"username\": \"user\", \"password\": \"pw\"}";
+        startHttp.body = "{\"username\": \"{{username}}\", \"password\": \"{{password}}\"}";
         startHttp.plan = plan;
         startHttp.name = "Sign Up";
         startHttp.description = "Creates an account";
         startHttp.responseContentType = RequestContentType.APPLICATION_JSON;
         startHttp.contentType = RequestContentType.APPLICATION_JSON;
-        startHttp.nextSteps = new ArrayList<>();
         httpStepRepository.persist(startHttp);
 
         InputArgument inArgNameSignIn = new InputArgument();
@@ -119,6 +116,9 @@ public class InitBean {
         pwParamRelationSetup.toArg = inArgPwSignIn;
         relationRepository.persist(pwParamRelationSetup);
 
+        createUser.nextSteps.add(startHttp);
+        scriptStepRepository.persist(createUser);        
+
         ScriptStep convertParameterToBodyStep = new ScriptStep();
         convertParameterToBodyStep.name = "Parse Body";
         convertParameterToBodyStep.description = "Takes the input arguments and parses them into a json body";
@@ -153,6 +153,9 @@ public class InitBean {
         pwParamRelation.toArg = inArgPw;
         relationRepository.persist(pwParamRelation);
 
+        startHttp.nextSteps.add(convertParameterToBodyStep);
+        httpStepRepository.persist(startHttp);     
+
         HttpStep loginHttp = new HttpStep();
         loginHttp.method = "POST";
         loginHttp.url = BASE_URL + "/login";
@@ -162,7 +165,6 @@ public class InitBean {
         loginHttp.description = "Sign into an account";
         loginHttp.responseContentType = RequestContentType.APPLICATION_JSON;
         loginHttp.contentType = RequestContentType.APPLICATION_JSON;
-        loginHttp.nextSteps = new ArrayList<>();
         httpStepRepository.persist(loginHttp);
 
         InputArgument inArgBody = new InputArgument();
@@ -176,15 +178,15 @@ public class InitBean {
         outArgToken.outputType = OutputType.PLAIN_TEXT;
         outArgToken.step = loginHttp;
         outputArgumentRepository.persist(outArgToken);
-
-        startHttp.nextSteps.add(loginHttp);
-        httpStepRepository.persist(startHttp);
-
+        
         StepParameterRelation bodyParamRelation = new StepParameterRelation();
         bodyParamRelation.fromArg = outArgBody;
         bodyParamRelation.toArg = inArgBody;
         relationRepository.persist(bodyParamRelation);
 
+        convertParameterToBodyStep.nextSteps.add(loginHttp);
+        scriptStepRepository.persist(convertParameterToBodyStep);
+        
         HttpStep sleepHttp = new HttpStep();
         sleepHttp.method = "GET";
         sleepHttp.url = BASE_URL + "/sleep/{token}/4";
@@ -194,7 +196,6 @@ public class InitBean {
         sleepHttp.description = "Sleep for 4 seconds";
         sleepHttp.responseContentType = RequestContentType.APPLICATION_JSON;
         sleepHttp.contentType = RequestContentType.APPLICATION_JSON;
-        sleepHttp.nextSteps = new ArrayList<>();
         httpStepRepository.persist(sleepHttp);
 
         InputArgument inArgToken = new InputArgument();
@@ -209,6 +210,64 @@ public class InitBean {
 
         loginHttp.nextSteps.add(sleepHttp);
         httpStepRepository.persist(loginHttp);
+
+        ScriptStep createInputForMultiPart = new ScriptStep();
+        createInputForMultiPart.name = "Create inputs for multipart";
+        createInputForMultiPart.description = "Creates input arguments for multipart request";
+        createInputForMultiPart.plan = plan;
+        createInputForMultiPart.script = "return {name: \"filenr-\"+Math.floor(Math.random()*10000), file: \"file content\"};";
+        scriptStepRepository.persist(createInputForMultiPart);
+
+        OutputArgument outArgNameInputForMulti = new OutputArgument();
+        outArgNameInputForMulti.name = "name";
+        outArgNameInputForMulti.parameterLocation = "name";
+        outArgNameInputForMulti.outputType = OutputType.PLAIN_TEXT;
+        outArgNameInputForMulti.step = createInputForMultiPart;
+        outputArgumentRepository.persist(outArgNameInputForMulti);
+
+        OutputArgument outArgFileInputForMulti = new OutputArgument();
+        outArgFileInputForMulti.name = "file";
+        outArgFileInputForMulti.parameterLocation = "file";
+        outArgFileInputForMulti.outputType = OutputType.OCTET_STREAM;
+        outArgFileInputForMulti.step = createInputForMultiPart;
+        outputArgumentRepository.persist(outArgFileInputForMulti);
+
+        loginHttp.nextSteps.add(createInputForMultiPart);
+        httpStepRepository.persist(loginHttp);
+
+        HttpStep multiPartHttpStep = new HttpStep();
+        multiPartHttpStep.method = "POST";
+        multiPartHttpStep.url = BASE_URL + "/multipart";
+        multiPartHttpStep.body = "";
+        multiPartHttpStep.contentType = RequestContentType.MULTIPART_FORM_DATA;
+        multiPartHttpStep.responseContentType = RequestContentType.APPLICATION_JSON;
+        multiPartHttpStep.name = "Multipart";
+        multiPartHttpStep.description = "Sends a multipart post request to backend";
+        multiPartHttpStep.plan = plan;
+        httpStepRepository.persist(multiPartHttpStep);
+        
+        InputArgument inArgMultipartName = new InputArgument();
+        inArgMultipartName.name = "name";
+        inArgMultipartName.step = multiPartHttpStep;
+        inputArgumentRepository.persist(inArgMultipartName);
+        
+        InputArgument inArgMultipartFile = new InputArgument();
+        inArgMultipartFile.name = "file";
+        inArgMultipartFile.step = multiPartHttpStep;
+        inputArgumentRepository.persist(inArgMultipartFile);
+
+        StepParameterRelation fileNameParamRelation = new StepParameterRelation();
+        fileNameParamRelation.fromArg = outArgNameInputForMulti;
+        fileNameParamRelation.toArg = inArgMultipartName;
+        relationRepository.persist(fileNameParamRelation);
+        
+        StepParameterRelation fileContentParamRelation = new StepParameterRelation();
+        fileContentParamRelation.fromArg = outArgFileInputForMulti;
+        fileContentParamRelation.toArg = inArgMultipartFile;
+        relationRepository.persist(fileContentParamRelation);
+
+        createInputForMultiPart.nextSteps.add(multiPartHttpStep);
+        scriptStepRepository.persist(createInputForMultiPart);
 
         PlanRun planRun = new PlanRun();
         planRun.plan = plan;

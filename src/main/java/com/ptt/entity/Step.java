@@ -3,6 +3,8 @@ package com.ptt.entity;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 
 import javax.persistence.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -16,13 +18,13 @@ public class Step extends PanacheEntityBase {
     @ManyToOne
     public Plan plan;
     @ManyToMany
-    public List<Step> nextSteps;
+    public List<Step> nextSteps = new ArrayList<>();
     public String name;
     public String description;
     @Column(name = "step_type", insertable = false, updatable = false)
     public String type;
     @OneToMany
-    public List<InputArgument> inputArguments;
+    public List<InputArgument> inputArguments = new ArrayList<>();
     @OneToMany
-    public List<OutputArgument> outputArguments;
+    public List<OutputArgument> outputArguments = new ArrayList<>();
 }
