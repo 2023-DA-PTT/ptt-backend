@@ -43,9 +43,9 @@ public class OutputArgumentResource {
         return Response.ok(OutputArgumentDto.from(outputArgument)).build();
     }
 
-    @PATCH
+    @PUT
     @Transactional
-    public Response patchOutputArgumentForStep(
+    public Response putOutputArgumentForStep(
             @PathParam("planId") long planId,
             @PathParam("stepId") long stepId,
             OutputArgumentDto outputArgumentDto) {

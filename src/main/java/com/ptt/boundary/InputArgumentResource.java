@@ -41,9 +41,9 @@ public class InputArgumentResource {
         return Response.ok(InputArgumentDto.from(inputArgument)).status(201).build();
     }
 
-    @PATCH
+    @PUT
     @Transactional
-    public Response patchInputArgumentForStep(
+    public Response putInputArgumentForStep(
             @PathParam("planId") long planId,
             @PathParam("stepId") long stepId,
             InputArgumentDto inputArgumentDto) {
