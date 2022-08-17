@@ -8,11 +8,11 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 @RegisterForReflection
 public class PlanDto {
     private long id;
-    private long startId;
+    private Long startId;
     private String name;
     private String description;
 
-    public PlanDto(long id, @ProjectedFieldName("start.id") long startId, String name, String description) {
+    public PlanDto(long id, @ProjectedFieldName("start.id") Long startId, String name, String description) {
         this.id = id;
         this.startId = startId;
         this.name = name;
@@ -20,7 +20,7 @@ public class PlanDto {
     }
 
     public static PlanDto from(Plan plan) {
-        return new PlanDto(plan.id, plan.start.id, plan.name, plan.description);
+        return new PlanDto(plan.id, plan.start == null ? null : plan.start.id, plan.name, plan.description);
     }
 
     public long getId() {
@@ -31,11 +31,11 @@ public class PlanDto {
         this.id = id;
     }
 
-    public long getStartId() {
+    public Long getStartId() {
         return startId;
     }
 
-    public void setStartId(long startId) {
+    public void setStartId(Long startId) {
         this.startId = startId;
     }
 
