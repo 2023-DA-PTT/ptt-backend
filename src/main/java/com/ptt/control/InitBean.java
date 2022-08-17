@@ -245,7 +245,7 @@ public class InitBean {
         httpStepRepository.persist(loginHttp);
 
         ScriptStep createInputForMultiPart = new ScriptStep();
-        createInputForMultiPart.name = "Create inputs for multipart";
+        createInputForMultiPart.name = "Create Multipart Form";
         createInputForMultiPart.description = "Creates input arguments for multipart request";
         createInputForMultiPart.plan = plan;
         createInputForMultiPart.script = "return {name: \"filenr-\"+Math.floor(Math.random()*10000), file: \"file content\"};";
