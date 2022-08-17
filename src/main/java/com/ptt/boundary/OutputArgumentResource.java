@@ -45,15 +45,17 @@ public class OutputArgumentResource {
 
     @PUT
     @Transactional
+    @Path("{outArgId}")
     public Response putOutputArgumentForStep(
             @PathParam("planId") long planId,
             @PathParam("stepId") long stepId,
+            @PathParam("outArgId") long outArgId,
             OutputArgumentDto outputArgumentDto) {
         Step step = stepRepository.findById(stepId);
         if(step == null) {
             return Response.status(400).build();
         }
-        OutputArgument arg = outputArgumentRepository.findById(outputArgumentDto.getId());
+        OutputArgument arg = outputArgumentRepository.findById(outArgId);
         if(arg == null) {
             return Response.status(400).build();
         }
@@ -62,6 +64,21 @@ public class OutputArgumentResource {
         arg.parameterLocation = outputArgumentDto.getParameterLocation();
         outputArgumentRepository.persist(arg);
         return Response.ok(OutputArgumentDto.from(arg)).status(200).build();
+    }
+
+    @DELETE
+    @Transactional
+    @Path("{outArgId}")
+    public Response deleteInputArgumentById(
+            @PathParam("planId") long planId,
+            @PathParam("stepId") long stepId,
+            @PathParam("outArgId") long outArgId) {
+        OutputArgument outputArgument = outputArgumentRepository.find("id", outArgId).singleResult();
+        if(outputArgument == null) {
+            return Response.status(404).build();
+        }
+        outputArgumentRepository.delete(outputArgument);
+        return Response.ok(OutputArgumentDto.from(outputArgument)).build();
     }
 
     @GET

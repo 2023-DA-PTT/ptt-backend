@@ -43,21 +43,38 @@ public class InputArgumentResource {
 
     @PUT
     @Transactional
+    @Path("{inArgId}")
     public Response putInputArgumentForStep(
             @PathParam("planId") long planId,
             @PathParam("stepId") long stepId,
+            @PathParam("inArgId") long inArgId,
             InputArgumentDto inputArgumentDto) {
         Step step = stepRepository.findById(stepId);
         if(step == null) {
             return Response.status(400).build();
         }
-        InputArgument arg = inputArgumentRepository.findById(inputArgumentDto.getId());
+        InputArgument arg = inputArgumentRepository.findById(inArgId);
         if(arg == null) {
-            return Response.status(400).build();
+            return Response.status(404).build();
         }
         arg.name = inputArgumentDto.getName();
         inputArgumentRepository.persist(arg);
         return Response.ok(InputArgumentDto.from(arg)).status(200).build();
+    }
+
+    @DELETE
+    @Transactional
+    @Path("{inArgId}")
+    public Response deleteInputArgumentById(
+            @PathParam("planId") long planId,
+            @PathParam("stepId") long stepId,
+            @PathParam("inArgId") long inArgId) {
+        InputArgument inputArgument = inputArgumentRepository.find("id", inArgId).singleResult();
+        if(inputArgument == null) {
+            return Response.status(404).build();
+        }
+        inputArgumentRepository.delete(inputArgument);
+        return Response.ok(InputArgumentDto.from(inputArgument)).build();
     }
 
     @GET
