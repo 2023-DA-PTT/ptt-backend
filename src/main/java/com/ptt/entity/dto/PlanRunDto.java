@@ -13,19 +13,29 @@ public class PlanRunDto {
     private long planId;
     private long startTime;
     private long duration;
+    private boolean runOnce;
     private List<PlanRunInstructionDto> planRunInstructions;
 
-    public PlanRunDto(long id, @ProjectedFieldName("plan.id") long planId, long startTime, long duration) {
+    public PlanRunDto(long id, @ProjectedFieldName("plan.id") long planId, long startTime, long duration, boolean runOnce) {
         this.id = id;
         this.planId = planId;
         this.startTime = startTime;
         this.duration = duration;
+        this.runOnce = runOnce;
     }
 
     public static PlanRunDto from(PlanRun planRun) {
-        PlanRunDto planRunDto = new PlanRunDto(planRun.id, planRun.plan.id, planRun.startTime, planRun.duration);
+        PlanRunDto planRunDto = new PlanRunDto(planRun.id, planRun.plan.id, planRun.startTime, planRun.duration, planRun.runOnce);
         planRunDto.planRunInstructions = PlanRunInstructionDto.from(planRun.planRunInstructions);
         return planRunDto;
+    }
+
+    public boolean isRunOnce() {
+        return runOnce;
+    }
+
+    public void setRunOnce(boolean runOnce) {
+        this.runOnce = runOnce;
     }
 
     public long getId() {

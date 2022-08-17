@@ -61,6 +61,7 @@ public class PlanRunResource {
         
         PlanRun planRun = new PlanRun();
         planRun.plan = plan;
+        planRun.runOnce = planRunDto.isRunOnce();
         planRun.startTime = planRunDto.getStartTime() <= currentTime ? currentTime : planRunDto.getStartTime();
         planRun.duration = planRunDto.getDuration();
         planRunRepository.persist(planRun);
