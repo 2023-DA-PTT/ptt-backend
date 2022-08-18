@@ -2,6 +2,7 @@ package com.ptt.boundary;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -71,7 +72,12 @@ public class PlanRunResource {
         planRun.startTime = planRunDto.getStartTime() <= currentTime ? currentTime : planRunDto.getStartTime();
         planRun.duration = planRunDto.getDuration();
         planRunRepository.persist(planRun);
-        for(PlanRunInstructionDto dto : planRunDto.getPlanRunInstructions()) {
+        
+        Set<String> clusterNodeList = clientManager.getNodeNames();
+        for(PlanRunInstructionDto dto : planRunDto.getPlanRunInstructions()) {       
+            if(!clusterNodeList.contains(dto.getNodeName())) {
+                return Response.status(400).build();
+            }
             PlanRunInstruction instruction = new PlanRunInstruction();
             instruction.setPlanRun(planRun);
             instruction.setNumberOfClients(dto.getNumberOfClients());

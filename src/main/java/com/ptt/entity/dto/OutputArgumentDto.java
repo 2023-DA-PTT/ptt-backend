@@ -1,8 +1,4 @@
 package com.ptt.entity.dto;
-
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-
 import com.ptt.entity.OutputArgument;
 import com.ptt.entity.OutputType;
 
@@ -15,7 +11,6 @@ public class OutputArgumentDto {
     private long id;
     private String name;
     private String parameterLocation;
-    @Enumerated(EnumType.ORDINAL)
     private OutputType outputType;
 
     public OutputArgumentDto(long id, @ProjectedFieldName("step.id") long stepId, String name, String parameterLocation, OutputType outputType) {

@@ -15,6 +15,7 @@ public class OutputArgument extends PanacheEntityBase {
     public Step step;
     public String name;
     public String parameterLocation;
+    @Enumerated(EnumType.ORDINAL)
     public OutputType outputType;
     @OneToMany(mappedBy = "fromArg", cascade = {CascadeType.REMOVE})
     public List<StepParameterRelation> parameterRelations;

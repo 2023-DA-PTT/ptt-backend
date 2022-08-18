@@ -1,6 +1,8 @@
 package com.ptt.control;
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -32,6 +34,16 @@ public class PttClientManager {
 
     @ConfigProperty(name = "pttclientmanager.pull-policy")
     String clientPullPolicy = "Always";
+
+    public Set<String> getNodeNames() {
+        return kubernetesClient
+                .nodes()
+                .list()
+                .getItems()
+                .stream()
+                .map((t) -> t.getMetadata().getName())
+                .collect(Collectors.toSet());
+    }
 
     public void startClient(long planRunId, PlanRunInstructionDto planRunInstructionDto) {
         kubernetesClient.batch().v1().jobs().inNamespace("ptt").create(
