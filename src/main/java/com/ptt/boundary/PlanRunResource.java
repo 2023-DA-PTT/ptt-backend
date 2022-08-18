@@ -50,6 +50,12 @@ public class PlanRunResource {
         return planRunDto;
     }
 
+    @GET
+    @Path("/plan/{planId}")
+    public List<PlanRunDto> getPlanRunsForPlan(@PathParam("planId") long planId) {
+        return planRunRepository.find("plan.id", planId).project(PlanRunDto.class).list();
+    }
+
     @POST
     @Transactional
     public Response createPlanRun(PlanRunDto planRunDto) {
@@ -61,6 +67,7 @@ public class PlanRunResource {
         
         PlanRun planRun = new PlanRun();
         planRun.plan = plan;
+        planRun.runOnce = planRunDto.isRunOnce();
         planRun.startTime = planRunDto.getStartTime() <= currentTime ? currentTime : planRunDto.getStartTime();
         planRun.duration = planRunDto.getDuration();
         planRunRepository.persist(planRun);
