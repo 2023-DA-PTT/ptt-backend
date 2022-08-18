@@ -313,11 +313,5 @@ public class InitBean {
 
         createInputForMultiPart.nextSteps.add(createInputNextStep);
         scriptStepRepository.persist(createInputForMultiPart);
-
-        PlanRun planRun = new PlanRun();
-        planRun.plan = plan;
-        planRun.startTime = System.currentTimeMillis();
-        planRun.duration = 5 * 60 * 1000; // 5 min
-        planRunRepository.persist(planRun);
     }
 }
