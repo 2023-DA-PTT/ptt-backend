@@ -62,7 +62,4 @@ public class DataPointDto {
     public void setDuration(long duration) {
         this.duration = duration;
     }
-
-    
-
 }
