@@ -5,6 +5,10 @@ import com.ptt.entity.RequestContentType;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RegisterForReflection
 public class HttpStepDto {
     private Long id;
@@ -15,8 +19,10 @@ public class HttpStepDto {
     private String body;
     private RequestContentType responseContentType;
     private RequestContentType contentType;
+    private Collection<HttpStepHeaderDto> headers;
 
-    public HttpStepDto(Long id, String name, String description, String method, String url, String body, RequestContentType responseContentType, RequestContentType contentType) {
+    // ong, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, com.ptt.entity.RequestContentType, com.ptt.entity.RequestContentType, java.util.Collection
+    public HttpStepDto(Long id, String name, String description, String method, String url, String body, RequestContentType responseContentType, RequestContentType contentType, Collection<HttpStepHeaderDto> headers) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -25,11 +31,22 @@ public class HttpStepDto {
         this.body = body;
         this.responseContentType = responseContentType;
         this.contentType = contentType;
+        this.headers = headers;
     }
 
 
     public static HttpStepDto from(HttpStep httpStep) {
-        return new HttpStepDto(httpStep.id, httpStep.name, httpStep.description, httpStep.method, httpStep.url, httpStep.body, httpStep.responseContentType, httpStep.contentType);
+        return new HttpStepDto(httpStep.id,
+                httpStep.name,
+                httpStep.description,
+                httpStep.method,
+                httpStep.url,
+                httpStep.body,
+                httpStep.responseContentType,
+                httpStep.contentType,
+                httpStep.headers.stream().map(HttpStepHeaderDto::from)
+                        .collect(Collectors.toList())
+        );
     }
 
     public Long getId() {
@@ -105,5 +122,13 @@ public class HttpStepDto {
 
     public void setContentType(RequestContentType contentType) {
         this.contentType = contentType;
+    }
+
+    public Collection<HttpStepHeaderDto> getHeaders() {
+        return headers;
+    }
+
+    public void setHeaders(List<HttpStepHeaderDto> headers) {
+        this.headers = headers;
     }
 }

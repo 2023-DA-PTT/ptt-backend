@@ -1,7 +1,11 @@
 package com.ptt.entity;
 
+import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.OneToMany;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @DiscriminatorValue("http")
@@ -10,5 +14,7 @@ public class HttpStep extends Step {
     public String url;
     public String body;
     public RequestContentType responseContentType;
-    public RequestContentType contentType; 
+    public RequestContentType contentType;
+    @OneToMany(mappedBy = "step", cascade = {CascadeType.REMOVE})
+    public List<HttpStepHeader> headers = new ArrayList<>();
 }
