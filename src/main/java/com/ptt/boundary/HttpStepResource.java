@@ -23,9 +23,6 @@ import com.ptt.entity.HttpStep;
 import com.ptt.entity.HttpStepHeader;
 import com.ptt.entity.Plan;
 import com.ptt.entity.dto.HttpStepDto;
-import com.ptt.entity.dto.HttpStepHeaderDto;
-import io.quarkus.logging.Log;
-
 
 @Path("plan/{planId}/step")
 @Consumes(MediaType.APPLICATION_JSON)

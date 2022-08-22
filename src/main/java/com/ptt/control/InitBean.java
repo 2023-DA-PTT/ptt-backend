@@ -42,11 +42,15 @@ public class InitBean {
         defaultUser.username = "default";
         userRepository.persist(defaultUser);
         System.out.println(defaultUser.id);
-
+        
+        createDefaultTestPlan(defaultUser);
+    }
+    
+    private void createDefaultTestPlan(User user) {
         Plan plan = new Plan();
         plan.name = "example";
         plan.description = "first demo test plan for testing";
-        plan.user = defaultUser;
+        plan.user = user;
         planRepository.persist(plan);
 
         ScriptStep createUser = new ScriptStep();

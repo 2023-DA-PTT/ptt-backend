@@ -5,6 +5,7 @@ import com.ptt.entity.RequestContentType;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,7 +20,7 @@ public class HttpStepDto {
     private String body;
     private RequestContentType responseContentType;
     private RequestContentType contentType;
-    private Collection<HttpStepHeaderDto> headers;
+    private Collection<HttpStepHeaderDto> headers = new ArrayList<>();
 
     // ong, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, com.ptt.entity.RequestContentType, com.ptt.entity.RequestContentType, java.util.Collection
     public HttpStepDto(Long id, String name, String description, String method, String url, String body, RequestContentType responseContentType, RequestContentType contentType, Collection<HttpStepHeaderDto> headers) {
