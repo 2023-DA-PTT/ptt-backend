@@ -4,7 +4,7 @@ import com.ptt.control.NextStepRepository;
 import com.ptt.control.PlanRepository;
 import com.ptt.control.StepRepository;
 import com.ptt.entity.Step;
-import com.ptt.entity.dto.NextStepDto;
+import com.ptt.entity.dto.NextStepWithParameterRelationDto;
 import com.ptt.entity.dto.StepDto;
 
 import javax.inject.Inject;
@@ -42,11 +42,8 @@ public class StepResource {
 
     @GET
     @Path("{stepId}/nexts")
-    public List<NextStepDto> getAllNextsByIdForPlan(@PathParam("planId") long planId, @PathParam("stepId") long stepId) {
-        return nextStepRepository
-        .find("fromStep.plan.id = ?1 and fromStep.id = ?2", planId, stepId)
-        .project(NextStepDto.class)
-        .list();
+    public List<NextStepWithParameterRelationDto> getAllNextsByIdForPlan(@PathParam("planId") long planId, @PathParam("stepId") long stepId) {
+        return nextStepRepository.getAdvancedNextSteps(planId, stepId);
     }
 
     @DELETE
