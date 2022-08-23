@@ -197,6 +197,13 @@ public class InitBean {
         inArgBody.step = loginHttp;
         inputArgumentRepository.persist(inArgBody);
 
+        OutputArgument outArgMyAwesomeToken = new OutputArgument();
+        outArgMyAwesomeToken.name = "myawesometoken";
+        outArgMyAwesomeToken.parameterLocation = "body";
+        outArgMyAwesomeToken.outputType = OutputType.FROM_INPUT_PARAMETER;
+        outArgMyAwesomeToken.step = loginHttp;
+        outputArgumentRepository.persist(outArgMyAwesomeToken);
+
         OutputArgument outArgToken = new OutputArgument();
         outArgToken.name = "token";
         outArgToken.parameterLocation = "token";
@@ -255,12 +262,29 @@ public class InitBean {
         createInputForMultiPart.script = "return {name: \"filenr-\"+Math.floor(Math.random()*10000), file: \"file content\"};";
         scriptStepRepository.persist(createInputForMultiPart);
 
+        InputArgument inArgMyAwesomeTokenMultiPart = new InputArgument();
+        inArgMyAwesomeTokenMultiPart.name = "myawesometoken";
+        inArgMyAwesomeTokenMultiPart.step = createInputForMultiPart;
+        inputArgumentRepository.persist(inArgMyAwesomeTokenMultiPart);
+
+        StepParameterRelation myAwesomeTokenRelation = new StepParameterRelation();
+        myAwesomeTokenRelation.fromArg = outArgMyAwesomeToken;
+        myAwesomeTokenRelation.toArg = inArgMyAwesomeTokenMultiPart;
+        relationRepository.persist(myAwesomeTokenRelation);
+
         OutputArgument outArgNameInputForMulti = new OutputArgument();
         outArgNameInputForMulti.name = "name";
         outArgNameInputForMulti.parameterLocation = "name";
         outArgNameInputForMulti.outputType = OutputType.PLAIN_TEXT;
         outArgNameInputForMulti.step = createInputForMultiPart;
         outputArgumentRepository.persist(outArgNameInputForMulti);
+
+        OutputArgument outArgMyAwesomeTokenMultiPart = new OutputArgument();
+        outArgMyAwesomeTokenMultiPart.name = "myawesometoken";
+        outArgMyAwesomeTokenMultiPart.parameterLocation = "myawesometoken";
+        outArgMyAwesomeTokenMultiPart.outputType = OutputType.FROM_INPUT_PARAMETER;
+        outArgMyAwesomeTokenMultiPart.step = createInputForMultiPart;
+        outputArgumentRepository.persist(outArgMyAwesomeTokenMultiPart);
 
         OutputArgument outArgFileInputForMulti = new OutputArgument();
         outArgFileInputForMulti.name = "file";
@@ -299,10 +323,20 @@ public class InitBean {
         inArgMultipartFile.step = multiPartHttpStep;
         inputArgumentRepository.persist(inArgMultipartFile);
 
+        InputArgument inArgMultipartMyAwesomeToken = new InputArgument();
+        inArgMultipartMyAwesomeToken.name = "myawesometoken";
+        inArgMultipartMyAwesomeToken.step = multiPartHttpStep;
+        inputArgumentRepository.persist(inArgMultipartMyAwesomeToken);
+
         StepParameterRelation fileNameParamRelation = new StepParameterRelation();
         fileNameParamRelation.fromArg = outArgNameInputForMulti;
         fileNameParamRelation.toArg = inArgMultipartName;
         relationRepository.persist(fileNameParamRelation);
+
+        StepParameterRelation myAwesomeTokenMultipartParamRelation = new StepParameterRelation();
+        myAwesomeTokenMultipartParamRelation.fromArg = outArgMyAwesomeTokenMultiPart;
+        myAwesomeTokenMultipartParamRelation.toArg = inArgMultipartMyAwesomeToken;
+        relationRepository.persist(myAwesomeTokenMultipartParamRelation);
         
         StepParameterRelation fileContentParamRelation = new StepParameterRelation();
         fileContentParamRelation.fromArg = outArgFileInputForMulti;
