@@ -84,7 +84,7 @@ public class PlanResource {
     }
 
     @GET
-    @Path("{id}")
+    @Path("export/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response export(@PathParam("id") long planId) {
@@ -106,6 +106,17 @@ public class PlanResource {
         exportDto.setRelations(relations);
         exportDto.setPlanDto(PlanDto.from(plan));
 
+        return Response.ok().build();
+    }
+
+    @POST
+    @Path("import")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response importPlan(PlanExportDto importDto) {
+        Plan plan = new Plan();
+        plan.name = importDto.getPlanDto().getName();
+        plan.description = importDto.getPlanDto().getDescription();
         return Response.ok().build();
     }
 }
