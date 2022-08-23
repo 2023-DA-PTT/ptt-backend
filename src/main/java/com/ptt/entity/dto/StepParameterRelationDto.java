@@ -16,6 +16,7 @@ public class StepParameterRelationDto {
                                     @ProjectedFieldName("toArg.id") Long toId) {
         this.fromId = fromId;
         this.toId = toId;
+        this.id = id;
     }
 
     public static StepParameterRelationDto from(StepParameterRelation stepParameterRelation) {

@@ -4,19 +4,27 @@ import com.ptt.entity.dto.*;
 import java.util.List;
 
 public class PlanExportDto {
-    private PlanDto planDto;
+    private PlanDto plan;
     private List<HttpStepDto> httpSteps;
     private List<ScriptStepDto> scriptSteps;
     private List<InputArgumentDto> inputs;
     private List<OutputArgumentDto> outputs;
     private List<StepParameterRelationDto> relations;
+    private List<SimpleNextStepDto> nextSteps;
+    
     public PlanExportDto() {
     }
-    public PlanDto getPlanDto() {
-        return planDto;
+    public PlanDto getPlan() {
+        return plan;
     }
-    public void setPlanDto(PlanDto planDto) {
-        this.planDto = planDto;
+    public List<SimpleNextStepDto> getNextSteps() {
+        return nextSteps;
+    }
+    public void setNextSteps(List<SimpleNextStepDto> nextSteps) {
+        this.nextSteps = nextSteps;
+    }
+    public void setPlan(PlanDto planDto) {
+        this.plan = planDto;
     }
     public List<HttpStepDto> getHttpSteps() {
         return httpSteps;

@@ -4,23 +4,28 @@ import io.quarkus.hibernate.orm.panache.common.ProjectedFieldName;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
 @RegisterForReflection
-public class NextStepDto {
+public class SimpleNextStepDto {
     private Long id;
     private Long fromStepId;
-    private StepDto toStep;
+    private Long toStepId;
     private int repeatAmount;
-
-    public NextStepDto(Long id,
+    
+    public SimpleNextStepDto(Long id,
             @ProjectedFieldName("fromStep.id") Long fromStepId,
             @ProjectedFieldName("toStep.id") long toStepId,
-            @ProjectedFieldName("toStep.name") String toStepName,
-            @ProjectedFieldName("toStep.description") String toStepDescription,
-            @ProjectedFieldName("toStep.type") String toStepType,
             int repeatAmount) {
         this.id = id;
         this.fromStepId = fromStepId;
-        this.toStep = new StepDto(toStepId, toStepName, toStepDescription, toStepType);
+        this.toStepId = toStepId;
         this.repeatAmount = repeatAmount;
+    }
+
+    public Long getToStepId() {
+        return toStepId;
+    }
+
+    public void setToStepId(Long toStepId) {
+        this.toStepId = toStepId;
     }
 
     public Long getId() {
@@ -29,14 +34,6 @@ public class NextStepDto {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public StepDto getToStep() {
-        return toStep;
-    }
-
-    public void setToStep(StepDto toStep) {
-        this.toStep = toStep;
     }
 
     public int getRepeatAmount() {
