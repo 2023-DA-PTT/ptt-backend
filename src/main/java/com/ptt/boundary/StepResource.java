@@ -16,6 +16,7 @@ import com.ptt.entity.dto.NextStepWithParameterRelationDto;
 import com.ptt.entity.dto.StepDto;
 
 import javax.inject.Inject;
+import javax.transaction.SystemException;
 import javax.transaction.Transactional;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -42,6 +43,7 @@ public class StepResource {
 
     @Inject
     OutputArgumentRepository outputArgumentRepository;
+
     @Inject
     InputArgumentRepository inputArgumentRepository;
 
@@ -65,7 +67,7 @@ public class StepResource {
     @POST
     @Path("{stepId}/nexts")
     @Transactional
-    public Response updateAllNextsByIdForPlan(@PathParam("planId") long planId, @PathParam("stepId") long stepId, List<NextStepWithParameterRelationDto> nexts) {
+    public Response updateAllNextsByIdForPlan(@PathParam("planId") long planId, @PathParam("stepId") long stepId, List<NextStepWithParameterRelationDto> nexts) throws IllegalStateException, SecurityException, SystemException {
         relationRepository
         .getEntityManager()
         .createQuery("""
@@ -91,7 +93,7 @@ public class StepResource {
         for (NextStepWithParameterRelationDto nextDto : nexts) {
             Step toStep = stepRepository.findById(nextDto.getToStep().getId());
             if(toStep == null) {
-                return Response.status(400).build();
+                throw new BadRequestException();
             }
             NextStep next = new NextStep();
             next.fromStep = step;
@@ -102,7 +104,7 @@ public class StepResource {
                 OutputArgument outArg = outputArgumentRepository.findById(relationDto.getOutputArgId());
                 InputArgument inArg = inputArgumentRepository.findById(relationDto.getInputArg().getId());
                 if(inArg ==null || outArg == null) {
-                    return Response.status(400).build();
+                    throw new BadRequestException();
                 }
                 StepParameterRelation relation = new StepParameterRelation();
                 relation.fromArg = outArg;
