@@ -1,5 +1,6 @@
 package com.ptt.boundary;
 
+import com.ptt.control.HttpStepHeaderRepository;
 import com.ptt.control.HttpStepRepository;
 import com.ptt.control.InputArgumentRepository;
 import com.ptt.control.NextStepRepository;
@@ -9,6 +10,7 @@ import com.ptt.control.ScriptStepRepository;
 import com.ptt.control.StepParameterRelationRepository;
 import com.ptt.control.UserRepository;
 import com.ptt.entity.HttpStep;
+import com.ptt.entity.HttpStepHeader;
 import com.ptt.entity.InputArgument;
 import com.ptt.entity.NextStep;
 import com.ptt.entity.OutputArgument;
@@ -18,6 +20,7 @@ import com.ptt.entity.Step;
 import com.ptt.entity.StepParameterRelation;
 import com.ptt.entity.User;
 import com.ptt.entity.dto.HttpStepDto;
+import com.ptt.entity.dto.HttpStepHeaderDto;
 import com.ptt.entity.dto.InputArgumentDto;
 import com.ptt.entity.dto.OutputArgumentDto;
 import com.ptt.entity.dto.PlanDto;
@@ -63,6 +66,8 @@ public class PlanResource {
     StepParameterRelationRepository relationRepository;
     @Inject
     NextStepRepository nextStepRepository;
+    @Inject
+    HttpStepHeaderRepository httpStepHeaderRepository;
 
     @GET
     public List<PlanDto> getAllPlans() {
@@ -151,6 +156,13 @@ public class PlanResource {
             httpStep.responseContentType = httpStepDto.getResponseContentType();
             httpStep.contentType = httpStepDto.getContentType();
             httpStepRepository.persist(httpStep);
+            for(HttpStepHeaderDto headerDto : httpStepDto.getHeaders()) {
+                HttpStepHeader httpStepHeader = new HttpStepHeader();
+                httpStepHeader.name = headerDto.getName();
+                httpStepHeader.value = headerDto.getValue();
+                httpStepHeader.step = httpStep;
+                httpStepHeaderRepository.persist(httpStepHeader);
+            }
             if(httpStepDto.getId() == importDto.getPlan().getStartId()) {
                 plan.start = httpStep;
                 planRepository.persist(plan);
