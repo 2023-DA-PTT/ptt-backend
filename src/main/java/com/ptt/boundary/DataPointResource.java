@@ -29,6 +29,6 @@ public class DataPointResource {
     @GET
     @Path("planrun/{planRunId}/step/{stepId}")
     public List<DataPointDto> getDataPointsForStep(@PathParam("planRunId") long planRunId,@PathParam("stepId") long stepId) {
-        return dataPointRepository.find("planRun.id=?1 and step.id=?2", planRunId, stepId).project(DataPointDto.class).list();
+        return dataPointRepository.find("planRun.id=?1 and step.id=?2 order by startTime", planRunId, stepId).project(DataPointDto.class).list();
     }
 }

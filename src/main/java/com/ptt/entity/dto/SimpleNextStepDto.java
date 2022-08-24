@@ -1,5 +1,7 @@
 package com.ptt.entity.dto;
 
+import com.ptt.entity.NextStep;
+
 import io.quarkus.hibernate.orm.panache.common.ProjectedFieldName;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
@@ -18,6 +20,10 @@ public class SimpleNextStepDto {
         this.fromStepId = fromStepId;
         this.toStepId = toStepId;
         this.repeatAmount = repeatAmount;
+    }
+
+    public static SimpleNextStepDto from(NextStep nextStep) {
+        return new SimpleNextStepDto(nextStep.id,nextStep.fromStep.id, nextStep.toStep.id, nextStep.repeatAmount);
     }
 
     public Long getToStepId() {

@@ -14,6 +14,7 @@ import com.ptt.entity.StepParameterRelation;
 import com.ptt.entity.dto.AdvancedStepParameterRelationDto;
 import com.ptt.entity.dto.NextStepWithParameterRelationDto;
 import com.ptt.entity.dto.StepDto;
+import com.ptt.entity.dto.StepWithNextsDto;
 
 import javax.inject.Inject;
 import javax.transaction.SystemException;
@@ -48,8 +49,11 @@ public class StepResource {
     InputArgumentRepository inputArgumentRepository;
 
     @GET
-    public List<StepDto> getAllStepsForPlan(@PathParam("planId") long planId) {
-        return stepRepository.find("plan.id", planId).project(StepDto.class).list();
+    public List<StepWithNextsDto> getAllStepsForPlan(@PathParam("planId") long planId) {
+        return stepRepository.find("plan.id", planId)
+            .list()
+            .stream().map(s->StepWithNextsDto.from(s))
+            .toList();
     }
 
     @GET
