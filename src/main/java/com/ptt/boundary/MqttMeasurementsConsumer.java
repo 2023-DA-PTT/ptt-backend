@@ -37,7 +37,7 @@ public class MqttMeasurementsConsumer {
     StepRepository stepRepository;
 
     @Incoming("measurements")
-    @Blocking
+    @Blocking(ordered = false)
     @Transactional
     public CompletionStage<Void> consume(Message<byte[]> measurement) {
         ObjectMapper objectMapper = new ObjectMapper();
