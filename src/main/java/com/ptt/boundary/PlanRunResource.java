@@ -75,7 +75,7 @@ public class PlanRunResource {
         
         Set<String> clusterNodeList = clientManager.getNodeNames();
         for(PlanRunInstructionDto dto : planRunDto.getPlanRunInstructions()) {       
-            if(!clusterNodeList.contains(dto.getNodeName())) {
+            if(!dto.getNodeName().equals("any") && !clusterNodeList.contains(dto.getNodeName())) {
                 return Response.status(400).build();
             }
             PlanRunInstruction instruction = new PlanRunInstruction();
