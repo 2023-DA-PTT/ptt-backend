@@ -47,7 +47,7 @@ public class PttClientManager {
 
     public void startClient(long planRunId, PlanRunInstructionDto planRunInstructionDto) {
         PodSpecBuilder clientPodSpec = new PodSpecBuilder();
-        if(planRunInstructionDto.getNodeName().toLowerCase().equals("any")) {
+        if(!planRunInstructionDto.getNodeName().toLowerCase().equals("any")) {
             clientPodSpec.withNodeName(planRunInstructionDto.getNodeName());
         }
         clientPodSpec.withContainers(
