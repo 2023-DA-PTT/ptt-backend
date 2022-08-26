@@ -46,6 +46,28 @@ public class PttClientManager {
     }
 
     public void startClient(long planRunId, PlanRunInstructionDto planRunInstructionDto) {
+        PodSpecBuilder clientPodSpec = new PodSpecBuilder();
+        if(planRunInstructionDto.getNodeName().toLowerCase().equals("any")) {
+            clientPodSpec.withNodeName(planRunInstructionDto.getNodeName());
+        }
+        clientPodSpec.withContainers(
+            new ContainerBuilder()
+            .withName("ptt-client-pod")
+            .withEnv(
+                new EnvVarBuilder()
+                .withName("TEST_PLAN_RUN_ID")
+                .withValue(String.valueOf(planRunId))
+                .build()
+            )
+            .withImage("ghcr.io/2023-da-ptt/ptt-client:latest")
+            .withImagePullPolicy(clientPullPolicy)
+            .build()
+        ).withImagePullSecrets(
+            new LocalObjectReferenceBuilder()
+            .withName("dockerconfigjson-github-com")
+            .build()
+        ).withRestartPolicy("Never");
+
         kubernetesClient.batch().v1().jobs().inNamespace("ptt").create(
             new JobBuilder()
             .withApiVersion("batch/v1")
@@ -59,27 +81,7 @@ public class PttClientManager {
                 .withParallelism(planRunInstructionDto.getNumberOfClients())
                 .withTemplate(
                     new PodTemplateSpecBuilder()
-                    .withSpec(
-                        new PodSpecBuilder()
-                        .withNodeName(planRunInstructionDto.getNodeName())
-                        .withContainers(
-                            new ContainerBuilder()
-                            .withName("ptt-client-pod")
-                            .withEnv(
-                                new EnvVarBuilder()
-                                .withName("TEST_PLAN_RUN_ID")
-                                .withValue(String.valueOf(planRunId))
-                                .build()
-                            )
-                            .withImage("ghcr.io/2023-da-ptt/ptt-client:latest")
-                            .withImagePullPolicy(clientPullPolicy)
-                            .build()
-                        ).withImagePullSecrets(
-                            new LocalObjectReferenceBuilder()
-                            .withName("dockerconfigjson-github-com")
-                            .build()
-                        ).withRestartPolicy("Never")
-                        .build())
+                    .withSpec(clientPodSpec.build())
                     .build())
                 .build())
             .build());
