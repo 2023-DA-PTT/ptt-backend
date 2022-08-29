@@ -17,6 +17,7 @@ public class PlanRun extends PanacheEntityBase {
     public Plan plan;
     public long startTime;
     public long duration;
+    public String name;
     public boolean runOnce;
     @OneToMany(mappedBy = "planRun")
     public List<PlanRunInstruction> planRunInstructions = new ArrayList<>();

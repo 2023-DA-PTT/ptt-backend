@@ -14,18 +14,20 @@ public class PlanRunDto {
     private long startTime;
     private long duration;
     private boolean runOnce;
+    private String name;
     private List<PlanRunInstructionDto> planRunInstructions;
 
-    public PlanRunDto(long id, @ProjectedFieldName("plan.id") long planId, long startTime, long duration, boolean runOnce) {
+    public PlanRunDto(long id, @ProjectedFieldName("plan.id") long planId, long startTime, long duration, boolean runOnce, String name) {
         this.id = id;
         this.planId = planId;
         this.startTime = startTime;
         this.duration = duration;
         this.runOnce = runOnce;
+        this.name = name;
     }
 
     public static PlanRunDto from(PlanRun planRun) {
-        PlanRunDto planRunDto = new PlanRunDto(planRun.id, planRun.plan.id, planRun.startTime, planRun.duration, planRun.runOnce);
+        PlanRunDto planRunDto = new PlanRunDto(planRun.id, planRun.plan.id, planRun.startTime, planRun.duration, planRun.runOnce, planRun.name);
         planRunDto.planRunInstructions = PlanRunInstructionDto.from(planRun.planRunInstructions);
         return planRunDto;
     }
@@ -76,5 +78,13 @@ public class PlanRunDto {
 
     public void setPlanRunInstructions(List<PlanRunInstructionDto> planRunInstructions) {
         this.planRunInstructions = planRunInstructions;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

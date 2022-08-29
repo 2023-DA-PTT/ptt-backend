@@ -71,6 +71,7 @@ public class PlanRunResource {
         planRun.runOnce = planRunDto.isRunOnce();
         planRun.startTime = planRunDto.getStartTime() <= currentTime ? currentTime : planRunDto.getStartTime();
         planRun.duration = planRunDto.getDuration();
+        planRun.name = planRunDto.getName();
         planRunRepository.persist(planRun);
         
         Set<String> clusterNodeList = clientManager.getNodeNames();
