@@ -69,7 +69,7 @@ public class OutputArgumentResource {
     @DELETE
     @Transactional
     @Path("{outArgId}")
-    public Response deleteInputArgumentById(
+    public Response deleteOutputArgumentById(
             @PathParam("planId") long planId,
             @PathParam("stepId") long stepId,
             @PathParam("outArgId") long outArgId) {

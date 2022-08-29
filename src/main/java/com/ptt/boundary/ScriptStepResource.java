@@ -102,7 +102,7 @@ public class ScriptStepResource {
 
     @GET
     @Path("script")
-    public List<ScriptStepDto> getAllStepsForPlan(@PathParam("planId") long planId) {
+    public List<ScriptStepDto> getAllScriptStepsForPlan(@PathParam("planId") long planId) {
         return scriptStepRepository.find("plan.id", planId).project(ScriptStepDto.class).list();
     }
 }
