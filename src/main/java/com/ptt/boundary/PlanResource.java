@@ -24,10 +24,10 @@ import com.ptt.entity.dto.HttpStepHeaderDto;
 import com.ptt.entity.dto.InputArgumentDto;
 import com.ptt.entity.dto.OutputArgumentDto;
 import com.ptt.entity.dto.PlanDto;
+import com.ptt.entity.dto.PlanExportDto;
 import com.ptt.entity.dto.ScriptStepDto;
 import com.ptt.entity.dto.SimpleNextStepDto;
 import com.ptt.entity.dto.StepParameterRelationDto;
-import com.ptt.entity.dto.export.PlanExportDto;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -146,7 +146,7 @@ public class PlanResource {
         Map<Long, InputArgument> inArgLookUp = new HashMap<>();
 
         for(HttpStepDto httpStepDto : importDto.getHttpSteps()) {
-            HttpStep httpStep = new HttpStep();        
+            HttpStep httpStep = new HttpStep();
             httpStep.name = httpStepDto.getName();
             httpStep.description = httpStepDto.getDescription();
             httpStep.plan = plan;
@@ -192,7 +192,7 @@ public class PlanResource {
             inArgLookUp.put(inArgDto.getId(), inputArgument);
         }
 
-        for(OutputArgumentDto outArgDto: importDto.getOutputs()) {   
+        for(OutputArgumentDto outArgDto: importDto.getOutputs()) {
             OutputArgument outputArgument = new OutputArgument();
             outputArgument.name = outArgDto.getName();
             outputArgument.parameterLocation = outArgDto.getParameterLocation();
@@ -201,7 +201,7 @@ public class PlanResource {
             outputArgumentRepository.persist(outputArgument);
             outArgLookUp.put(outArgDto.getId(), outputArgument);
         }
- 
+
         for(StepParameterRelationDto relationDto : importDto.getRelations()) {
             StepParameterRelation relation = new StepParameterRelation();
             relation.fromArg = outArgLookUp.get(relationDto.getFromId());

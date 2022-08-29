@@ -1,5 +1,4 @@
-package com.ptt.entity.dto.export;
-import com.ptt.entity.dto.*;
+package com.ptt.entity.dto;
 
 import java.util.List;
 
@@ -11,7 +10,7 @@ public class PlanExportDto {
     private List<OutputArgumentDto> outputs;
     private List<StepParameterRelationDto> relations;
     private List<SimpleNextStepDto> nextSteps;
-    
+
     public PlanExportDto() {
     }
     public PlanDto getPlan() {
@@ -57,5 +56,5 @@ public class PlanExportDto {
         this.relations = relations;
     }
 
-    
+
 }
