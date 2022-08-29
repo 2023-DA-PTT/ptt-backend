@@ -143,7 +143,7 @@ public class HttpStepResource {
 
     @GET
     @Path("http")
-    public List<HttpStepDto> getAllStepsForPlan(@PathParam("planId") long planId) {
+    public List<HttpStepDto> getAllHttpStepsForPlan(@PathParam("planId") long planId) {
         return httpStepRepository.find("plan.id", planId).list().stream().map(HttpStepDto::from).collect(Collectors.toList());
     }
 }
