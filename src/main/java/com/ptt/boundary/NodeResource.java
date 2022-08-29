@@ -6,7 +6,7 @@ import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
-import com.ptt.control.PttClientManager;
+import com.ptt.manager.PttClientManager;
 
 @Path("node")
 public class NodeResource {

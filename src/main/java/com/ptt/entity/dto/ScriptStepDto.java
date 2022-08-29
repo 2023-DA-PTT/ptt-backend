@@ -1,6 +1,6 @@
 package com.ptt.entity.dto;
 
-import com.ptt.entity.ScriptStep;
+import com.ptt.entity.step.ScriptStep;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
