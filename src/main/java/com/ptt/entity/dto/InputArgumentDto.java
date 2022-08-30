@@ -1,6 +1,6 @@
 package com.ptt.entity.dto;
 
-import com.ptt.entity.InputArgument;
+import com.ptt.entity.argument.InputArgument;
 
 import io.quarkus.hibernate.orm.panache.common.ProjectedFieldName;
 import io.quarkus.runtime.annotations.RegisterForReflection;

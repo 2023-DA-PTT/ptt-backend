@@ -1,6 +1,6 @@
 package com.ptt.entity.dto;
 
-import com.ptt.entity.HttpStepHeader;
+import com.ptt.entity.step.HttpStepHeader;
 
 import io.quarkus.hibernate.orm.panache.common.ProjectedFieldName;
 import io.quarkus.runtime.annotations.RegisterForReflection;

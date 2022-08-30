@@ -2,7 +2,7 @@ package com.ptt.entity.dto;
 
 import java.util.List;
 
-import com.ptt.entity.Step;
+import com.ptt.entity.step.Step;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
 

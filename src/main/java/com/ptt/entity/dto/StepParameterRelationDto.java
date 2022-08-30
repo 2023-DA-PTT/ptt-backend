@@ -1,6 +1,6 @@
 package com.ptt.entity.dto;
 
-import com.ptt.entity.StepParameterRelation;
+import com.ptt.entity.step.StepParameterRelation;
 
 import io.quarkus.hibernate.orm.panache.common.ProjectedFieldName;
 import io.quarkus.runtime.annotations.RegisterForReflection;

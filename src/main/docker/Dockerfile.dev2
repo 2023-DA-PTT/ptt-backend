@@ -1,7 +1,0 @@
-FROM maven:3.8.5-openjdk-17
-
-WORKDIR /app
-
-ENV QUARKUS_HTTP_HOST=0.0.0.0
-
-ENTRYPOINT [ "mvn", "compile", "quarkus:dev" ]
