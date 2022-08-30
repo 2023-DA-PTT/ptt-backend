@@ -3,7 +3,7 @@ package com.ptt.entity.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ptt.entity.PlanRunInstruction;
+import com.ptt.entity.plan.PlanRunInstruction;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
 

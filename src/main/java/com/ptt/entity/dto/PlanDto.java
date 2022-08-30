@@ -1,6 +1,6 @@
 package com.ptt.entity.dto;
 
-import com.ptt.entity.Plan;
+import com.ptt.entity.plan.Plan;
 
 import io.quarkus.hibernate.orm.panache.common.ProjectedFieldName;
 import io.quarkus.runtime.annotations.RegisterForReflection;
