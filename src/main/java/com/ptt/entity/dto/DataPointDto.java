@@ -1,17 +1,19 @@
 package com.ptt.entity.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.quarkus.hibernate.orm.panache.common.ProjectedFieldName;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
 @RegisterForReflection
 public class DataPointDto {
-    private long id;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Long id;
     private long planRunId;
     private long stepId;
     private long startTime;
     private long duration;
 
-    public DataPointDto(long id,
+    public DataPointDto(Long id,
             @ProjectedFieldName("planRun.id") long planRunId,
             @ProjectedFieldName("step.id") long stepId,
             long startTime,
@@ -23,7 +25,14 @@ public class DataPointDto {
         this.duration = duration;
     }
 
-    public long getId() {
+    public DataPointDto(@ProjectedFieldName("planRun.id") long planRunId,
+                        @ProjectedFieldName("step.id") long stepId,
+                        long startTime,
+                        long duration) {
+        this(null, planRunId, stepId, startTime, duration);
+    }
+
+    public Long getId() {
         return id;
     }
 
