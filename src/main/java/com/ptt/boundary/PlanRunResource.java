@@ -26,16 +26,16 @@ import com.ptt.entity.dto.PlanRunInstructionDto;
 public class PlanRunResource {
     @Inject
     PlanRunRepository planRunRepository;
-    
+
     @Inject
     PlanRepository planRepository;
 
     @Inject
     PlanRunInstructionRepository planRunInstructionRepository;
- 
+
     @Inject
     PttClientManager clientManager;
- 
+
     @GET
     public List<PlanRunDto> getAllPlanRuns() {
         return planRunRepository.findAll().project(PlanRunDto.class).list();
@@ -43,12 +43,15 @@ public class PlanRunResource {
 
     @GET
     @Path("{planrunid}")
-    public PlanRunDto getPlanRunById(@PathParam("planrunid") long id) {
-        PlanRunDto planRunDto = planRunRepository.find("id", id).project(PlanRunDto.class).singleResult();
+    public Response getPlanRunById(@PathParam("planrunid") long id) {
+        PlanRunDto planRunDto = planRunRepository.find("id", id).project(PlanRunDto.class).firstResult();
+        if(planRunDto == null) {
+          return Response.status(404).build();
+        }
         planRunDto.setPlanRunInstructions(planRunInstructionRepository
             .find("planRun.id", planRunDto.getId())
             .project(PlanRunInstructionDto.class).list());
-        return planRunDto;
+        return Response.ok(planRunDto).build();
     }
 
     @GET
@@ -65,7 +68,7 @@ public class PlanRunResource {
             return Response.status(400).build();
         }
         long currentTime = Instant.now().getEpochSecond();
-        
+
         PlanRun planRun = new PlanRun();
         planRun.plan = plan;
         planRun.runOnce = planRunDto.isRunOnce();
@@ -73,9 +76,9 @@ public class PlanRunResource {
         planRun.duration = planRunDto.getDuration();
         planRun.name = planRunDto.getName();
         planRunRepository.persist(planRun);
-        
+
         Set<String> clusterNodeList = clientManager.getNodeNames();
-        for(PlanRunInstructionDto dto : planRunDto.getPlanRunInstructions()) {       
+        for(PlanRunInstructionDto dto : planRunDto.getPlanRunInstructions()) {
             if(!dto.getNodeName().equals("any") && !clusterNodeList.contains(dto.getNodeName())) {
                 return Response.status(400).build();
             }

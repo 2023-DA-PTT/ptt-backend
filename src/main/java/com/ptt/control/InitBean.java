@@ -12,7 +12,7 @@ import javax.transaction.Transactional;
 @ApplicationScoped
 public class InitBean {
     String BASE_URL = "http://ptt-test-environment-service:8080";
-    
+
     @Inject
     UserRepository userRepository;
     @Inject
@@ -42,10 +42,10 @@ public class InitBean {
         defaultUser.username = "default";
         userRepository.persist(defaultUser);
         System.out.println(defaultUser.id);
-        
+
         createDefaultTestPlan(defaultUser);
     }
-    
+
     private void createDefaultTestPlan(User user) {
         Plan plan = new Plan();
         plan.name = "example";
@@ -171,7 +171,7 @@ public class InitBean {
         pwParamRelation.fromArg = outArgPw;
         pwParamRelation.toArg = inArgPw;
         relationRepository.persist(pwParamRelation);
-        
+
         NextStep startNextStep = new NextStep();
         startNextStep.fromStep = startHttp;
         startNextStep.toStep = convertParameterToBodyStep;
@@ -179,7 +179,7 @@ public class InitBean {
         nextStepRepository.persist(startNextStep);
 
         startHttp.nextSteps.add(startNextStep);
-        httpStepRepository.persist(startHttp);     
+        httpStepRepository.persist(startHttp);
 
         HttpStep loginHttp = new HttpStep();
         loginHttp.method = "POST";
@@ -210,7 +210,7 @@ public class InitBean {
         outArgToken.outputType = OutputType.PLAIN_TEXT;
         outArgToken.step = loginHttp;
         outputArgumentRepository.persist(outArgToken);
-        
+
         StepParameterRelation bodyParamRelation = new StepParameterRelation();
         bodyParamRelation.fromArg = outArgBody;
         bodyParamRelation.toArg = inArgBody;
@@ -224,7 +224,7 @@ public class InitBean {
 
         convertParameterToBodyStep.nextSteps.add(convertNextStep);
         scriptStepRepository.persist(convertParameterToBodyStep);
-        
+
         HttpStep sleepHttp = new HttpStep();
         sleepHttp.method = "GET";
         sleepHttp.url = BASE_URL + "/sleep/{token}/4";
@@ -312,12 +312,12 @@ public class InitBean {
         multiPartHttpStep.description = "Sends a multipart post request to backend";
         multiPartHttpStep.plan = plan;
         httpStepRepository.persist(multiPartHttpStep);
-        
+
         InputArgument inArgMultipartName = new InputArgument();
         inArgMultipartName.name = "name";
         inArgMultipartName.step = multiPartHttpStep;
         inputArgumentRepository.persist(inArgMultipartName);
-        
+
         InputArgument inArgMultipartFile = new InputArgument();
         inArgMultipartFile.name = "file";
         inArgMultipartFile.step = multiPartHttpStep;
@@ -337,7 +337,7 @@ public class InitBean {
         myAwesomeTokenMultipartParamRelation.fromArg = outArgMyAwesomeTokenMultiPart;
         myAwesomeTokenMultipartParamRelation.toArg = inArgMultipartMyAwesomeToken;
         relationRepository.persist(myAwesomeTokenMultipartParamRelation);
-        
+
         StepParameterRelation fileContentParamRelation = new StepParameterRelation();
         fileContentParamRelation.fromArg = outArgFileInputForMulti;
         fileContentParamRelation.toArg = inArgMultipartFile;

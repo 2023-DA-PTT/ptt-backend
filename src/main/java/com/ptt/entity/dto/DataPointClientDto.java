@@ -1,9 +1,11 @@
 package com.ptt.entity.dto;
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class DataPointClientDto {
+public class DataPointClientDto implements Serializable {
     private long planRunId;
     private long stepId;
     private long startTime;

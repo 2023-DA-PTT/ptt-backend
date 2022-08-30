@@ -16,6 +16,6 @@ public class NodeResource {
     @Path("locations")
     @GET
     public Set<String> getAllNodeLocations() {
-        return pttClientManager.getNodeNames();  
+        return pttClientManager.getNodeNames();
     }
 }
