@@ -1,7 +1,8 @@
 package com.ptt.boundary.result;
 
-import java.awt.print.Book;
-import java.util.List;
+import com.ptt.control.result.DataPointRepository;
+import com.ptt.entity.dto.DataPointDto;
+import com.ptt.entity.dto.result.AggregationType;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -9,14 +10,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
-
-import com.ptt.control.result.DataPointRepository;
-import com.ptt.entity.dto.DataPointDto;
-import com.ptt.entity.dto.result.AggregationType;
-import com.ptt.entity.result.DataPoint;
-import io.fabric8.kubernetes.api.model.Preconditions;
-import io.quarkus.hibernate.orm.panache.PanacheQuery;
-import io.quarkus.panache.common.Parameters;
+import java.util.List;
 
 @Path("datapoint")
 public class DataPointResource {
@@ -37,11 +31,11 @@ public class DataPointResource {
     @GET
     @Path("planrun/{planRunId}/step/{stepId}")
     public Response getDataPointsForStep(@PathParam("planRunId") long planRunId,
-                                         @PathParam("stepId") long stepId,
-                                         @QueryParam("from") Long from,
-                                         @QueryParam("to") Long to,
-                                         @QueryParam("interval") Long interval,
-                                         @QueryParam("aggr") String aggr) {
+                                                             @PathParam("stepId") long stepId,
+                                                             @QueryParam("from") Long from,
+                                                             @QueryParam("to") Long to,
+                                                             @QueryParam("interval") int interval,
+                                                             @QueryParam("aggr") String aggr) {
         AggregationType aggregationType = null;
 
         if(aggr != null) {
@@ -60,14 +54,16 @@ public class DataPointResource {
             }
         }
 
-        return Response.ok(dataPointRepository.findForStep(
-                        planRunId,
-                        stepId,
-                        from,
-                        to,
-                        interval,
-                        aggregationType
-                )
+        if(interval < 100) {
+            return Response.status(400, "Interval cannot be lower than 100ms").build();
+        }
+
+        return Response.ok(dataPointRepository.findWithIntervalPlPgSql(planRunId,
+                stepId,
+                from,
+                to,
+                interval,
+                aggregationType)
         ).build();
     }
 }
