@@ -1,8 +1,15 @@
-create type datapoint_type as
-(
-    duration bigint,
-    start    bigint -- not startTime because it would interract with the DataPoint.startTime column
-);
+
+
+DO '
+    BEGIN
+        IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = ''datapoint_type'') THEN
+            create type datapoint_type as
+            (
+                duration bigint,
+                start    bigint -- not startTime because it would interract with the DataPoint.startTime column
+            );
+        END IF;
+    END';
 
 create or replace FUNCTION get_datapoints8(interv int,
                                            sTime bigint, -- not startTime, same reason as above
