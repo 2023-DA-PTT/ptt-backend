@@ -2,6 +2,9 @@ package com.ptt.entity.result;
 
 import com.ptt.entity.plan.PlanRun;
 import com.ptt.entity.step.Step;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,6 +12,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
+@FilterDef(name = "DataPoint.fromDate",
+        defaultCondition = "startTime >= :from",
+        parameters = @ParamDef(name = "from", type = "long"))
+@FilterDef(name = "DataPoint.toDate",
+        defaultCondition = "startTime <= :to",
+        parameters = @ParamDef(name = "to", type = "long"))
+@Filter(name = "DataPoint.toDate")
+@Filter(name = "DataPoint.fromDate")
 @Entity
 public class DataPoint {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
