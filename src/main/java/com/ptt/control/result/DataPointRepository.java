@@ -36,4 +36,18 @@ public class DataPointRepository implements PanacheRepository<DataPoint> {
                 ((BigInteger)dbObj[1]).longValue()))
                 .collect(Collectors.toList());
     }
+
+    public Long getAvgPlanRunDuration(long planRunId, long stepId) {
+        if(count("planRun.id=?1 and step.id=?2", planRunId, stepId) < 1) {
+            return 0L;
+        }
+
+        return find("select avg(dp.duration) FROM DataPoint dp where dp.planRun.id=?1 and dp.step.id=?2", planRunId, stepId)
+                .project(Double.class)
+                .firstResult().longValue();
+    }
+
+    public Long getAvgDifferenceBetweenPlanRuns(long planRunId, long stepId, long compareToPlanRunId) {
+        return getAvgPlanRunDuration(planRunId, stepId) - getAvgPlanRunDuration(compareToPlanRunId, stepId); // TODO: Implement this using more complex sql query
+    }
 }
