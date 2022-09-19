@@ -62,8 +62,8 @@ public class InitBean {
 
     private void createDefaultTestPlan(User user) {
         Plan plan = new Plan();
-        plan.name = "example";
-        plan.description = "first demo test plan for testing";
+        plan.name = "PTT TestSite";
+        plan.description = "Test Plan for the PTT Test Website (https://test.perftest.tech)";
         plan.user = user;
         planRepository.persist(plan);
 

@@ -77,7 +77,7 @@ public class PlanResource {
     @GET
     @Path("user/{userId}")
     public List<PlanDto> getAllPlansForUser(@PathParam("userId") long userId) {
-        return planRepository.find("plan.user.id", userId).project(PlanDto.class).list();
+        return planRepository.find("user.id", userId).project(PlanDto.class).list();
     }
 
     @GET
