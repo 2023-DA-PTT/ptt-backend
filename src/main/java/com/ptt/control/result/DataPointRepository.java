@@ -16,7 +16,7 @@ public class DataPointRepository implements PanacheRepository<DataPoint> {
     @SuppressWarnings("unchecked")
     public List<DataPointResultDto> findWithIntervalPlPgSql(long planRunId, long stepId, Long from, Long to,
                                                             Integer interval, AggregationType aggregationType) {
-        List<Object[]> res = getEntityManager().createStoredProcedureQuery("get_datapoints8")
+        List<Object[]> res = getEntityManager().createStoredProcedureQuery("get_datapoints13")
                 .registerStoredProcedureParameter("interv", Integer.class, ParameterMode.IN)
                 .registerStoredProcedureParameter("sTime", Long.class, ParameterMode.IN)
                 .registerStoredProcedureParameter("eTime", Long.class, ParameterMode.IN)

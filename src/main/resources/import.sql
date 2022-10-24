@@ -1,44 +1,27 @@
-
-
-DO '
-    BEGIN
-        IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = ''datapoint_type'') THEN
-            create type datapoint_type as
-            (
-                duration bigint,
-                start    bigint -- not startTime because it would interract with the DataPoint.startTime column
-            );
-        END IF;
-    END';
-
-create or replace FUNCTION get_datapoints8(interv int,
-                                           sTime bigint, -- not startTime, same reason as above
-                                           eTime bigint, -- same as above
-                                           aggr character varying,
-                                           planid bigint,
-                                           stepid bigint)
-    RETURNS SETOF datapoint_type
+create or replace FUNCTION get_datapoints13(interv int,
+                                            sTime bigint, -- not startTime, same reason as above
+                                            eTime bigint, -- same as above
+                                            aggr character varying,
+                                            planid bigint,
+                                            stepid bigint)
+    RETURNS TABLE (
+                      duration bigint,
+                      start bigint)
     language plpgsql
 as
 '
     declare
-        v_act_dur bigint;
-        v_act     datapoint_type;
     begin
-        -- Looping through BigInt would throw an integer out of range exception
-        for counter in (interv)..(eTime - sTime) by interv
-            loop
-                SELECT MAX(dp.duration)
-                into v_act_dur
-                from datapoint AS dp
-                WHERE starttime >= (counter - interv) + sTime
-                  AND starttime < counter + sTime
-                  AND planrun_id = planid
-                  AND step_step_id = stepid;
-
-                IF v_act_dur is not null then
-                    SELECT v_act_dur, counter + sTime INTO v_act;
-                    RETURN NEXT v_act;
-                end if;
-            end loop;
+        RETURN QUERY
+            WITH series AS (
+                SELECT generate_series(sTime, eTime, interv) AS r_from -- 1950 = min, 2010 = max, 10 = 10 year interval
+            ), range AS (
+                SELECT r_from, (r_from + (interv-1)) AS r_to FROM series -- 9 = interval (10 years) minus 1
+            )
+            SELECT (SELECT MAX(dp.duration) FROM datapoint dp WHERE (starttime BETWEEN r_from AND r_to)
+                                                                AND planrun_id = planid
+                                                                AND step_step_id = stepid ) as duration, r_from as start
+            FROM range where (SELECT count(dp.duration) FROM datapoint dp WHERE (starttime BETWEEN r_from AND r_to)
+                                                                            AND planrun_id = planid
+                                                                            AND step_step_id = stepid ) > 0;
     end;';
