@@ -22,3 +22,28 @@ spec:
                 name: ptt-backend-service
                 port:
                   number: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ptt-keycloak-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    acme.cert-manager.io/http01-edit-in-place: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - secretName: auth-perftest-tech-tls
+      hosts:
+        - auth.perftest.tech
+  rules:
+    - host: "auth.perftest.tech"
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: ptt-keycloak-service
+                port:
+                  number: 8080

@@ -113,3 +113,38 @@ spec:
             items:
               - key: mosquitto.conf
                 path: mosquitto.conf
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ptt-keycloak
+  labels:
+    app: ptt-keycloak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ptt-keycloak
+  template:
+    metadata:
+      labels:
+        app: ptt-keycloak
+    spec:
+      containers:
+      - name: keycloak
+        image: quay.io/keycloak/keycloak:19.0.3
+        args: ["start", "--db-url-host", "{{ .Values.postgres.host }}", "--db-username", "{{ .Values.postgres.username }}", "--db-password", "{{ .Values.postgres.password }}", "--hostname-url", "{{.Values.keycloak.hostname}}"]
+        env:
+        - name: KEYCLOAK_ADMIN
+          value: {{ .Values.keycloak.username }}
+        - name: KEYCLOAK_ADMIN_PASSWORD
+          value: {{ .Values.keycloak.password }}
+        - name: KC_PROXY
+          value: "edge"
+        ports:
+        - name: http
+          containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /realms/master
+            port: 8080

@@ -5,3 +5,13 @@ image:
 
 # Wheter or not to use volumes ( for development mode set false)
 volumes: true
+
+postgres:
+  host: ptt-postgres-service
+  username: postgres
+  password: postgres
+
+keycloak:
+  username: s1mple133
+  password: 4XRXmsVNvqdK8KcJ!
+  hostname: https://auth.perftest.tech/
