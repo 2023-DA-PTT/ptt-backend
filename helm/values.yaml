@@ -1,4 +1,7 @@
 image:
   repository: ghcr.io/2023-da-ptt/ptt-backend
-  pullPolicy: IfNotPresent
-  tag: ""
+  pullPolicy: Always
+  tag: "latest"
+
+# Wheter or not to use volumes ( for development mode set false)
+volumes: true

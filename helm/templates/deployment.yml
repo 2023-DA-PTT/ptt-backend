@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ptt-backend
-  namespace: ptt
 spec:
   replicas: 1
   selector:
@@ -25,6 +24,68 @@ spec:
             limits:
               memory: "2048Mi"
               cpu: "1000m"
+      imagePullSecrets:
+        - name: dockerconfigjson-github-com
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ptt-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ptt-postgres
+  template:
+    metadata:
+      labels:
+        app: ptt-postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:latest
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 5432
+          envFrom:
+            - configMapRef:
+                name: ptt-postgres-secret
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+{{ if .Values.volumes }}
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: ptt-postgresdata
+{{ end }}
+      imagePullSecrets:
+        - name: dockerconfigjson-github-com
+{{ if .Values.volumes }}
+      volumes:
+        - name: ptt-postgresdata
+          persistentVolumeClaim:
+            claimName: ptt-postgres-volume-claim
+{{ end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ptt-mosquitto
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ptt-mosquitto
+  template:
+    metadata:
+      labels:
+        app: ptt-mosquitto
+    spec:
+      containers:
         - name: mqtt
           image: eclipse-mosquitto:latest
           imagePullPolicy: Always
@@ -43,31 +104,9 @@ spec:
           volumeMounts:
             - name: mosquitto-config
               mountPath: /mosquitto/config
-              
-        - name: postgres
-          image: postgres:latest
-          imagePullPolicy: "IfNotPresent"
-          ports:
-            - containerPort: 5432
-          envFrom:
-            - configMapRef:
-                name: ptt-postgres-secret
-          volumeMounts:
-            - mountPath: /var/lib/postgresql/data
-              name: ptt-postgresdata
-          resources:
-            requests:
-              memory: "64Mi"
-              cpu: "250m"
-            limits:
-              memory: "128Mi"
-              cpu: "500m"
       imagePullSecrets:
         - name: dockerconfigjson-github-com
       volumes:
-        - name: ptt-postgresdata
-          persistentVolumeClaim:
-            claimName: ptt-postgres-volume-claim
         - name: mosquitto-config
           configMap:
             name: mosquitto-config
