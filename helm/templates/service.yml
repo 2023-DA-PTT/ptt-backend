@@ -37,6 +37,7 @@ spec:
       port: 5432
       targetPort: 5432
 ---
+{{ if .Values.keycloak.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -50,3 +51,4 @@ spec:
   - name: http
     port: 8080
     targetPort: 8080
+{{ end }}

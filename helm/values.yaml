@@ -12,6 +12,13 @@ postgres:
   password: postgres
 
 keycloak:
+  enabled: true
   username: s1mple133
   password: 4XRXmsVNvqdK8KcJ!
   hostname: https://auth.perftest.tech/
+
+oidc:
+  url: https://auth.perftest.tech/realms/master
+  client:
+    id: backend-service
+    secret: E6Ghz9DEfTVf5Pga3aWQ6cvwDeOGxZhv

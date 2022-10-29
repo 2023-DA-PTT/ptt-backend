@@ -17,6 +17,13 @@ spec:
         - name: {{ .Chart.Name }}
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: QUARKUS_OIDC_AUTH-SERVER-URL
+              value: {{ .Values.oidc.url }}
+            - name: QUARKUS_OIDC_CLIENT-ID
+              value: {{ .Values.oidc.client.id }}
+            - name: QUARKUS_OIDC_CREDENTIALS_SECRET
+              value: {{ .Values.oidc.client.secret }}
           resources:
             requests:
               memory: "1024Mi"
@@ -113,6 +120,7 @@ spec:
             items:
               - key: mosquitto.conf
                 path: mosquitto.conf
+{{ if .Values.keycloak.enabled }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -148,3 +156,4 @@ spec:
           httpGet:
             path: /realms/master
             port: 8080
+{{ end}}
