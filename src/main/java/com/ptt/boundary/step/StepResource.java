@@ -15,6 +15,8 @@ import com.ptt.entity.dto.AdvancedStepParameterRelationDto;
 import com.ptt.entity.dto.NextStepWithParameterRelationDto;
 import com.ptt.entity.dto.StepDto;
 import com.ptt.entity.dto.StepWithNextsDto;
+import io.quarkus.security.Authenticated;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 
 import javax.inject.Inject;
 import javax.transaction.SystemException;
@@ -28,6 +30,7 @@ import java.util.List;
 @Path("plan/{planId}/step")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@Authenticated
 public class StepResource {
 
     @Inject
@@ -46,11 +49,14 @@ public class StepResource {
     OutputArgumentRepository outputArgumentRepository;
 
     @Inject
+    JsonWebToken jwt;
+
+    @Inject
     InputArgumentRepository inputArgumentRepository;
 
     @GET
     public List<StepWithNextsDto> getAllStepsForPlan(@PathParam("planId") long planId) {
-        return stepRepository.find("plan.id", planId)
+        return stepRepository.find("plan.id=?1 and plan.ownerId=?2", planId, jwt.getSubject())
             .list()
             .stream().map(s->StepWithNextsDto.from(s))
             .toList();
@@ -59,19 +65,26 @@ public class StepResource {
     @GET
     @Path("{stepId}")
     public StepDto getAllStepByIdForPlan(@PathParam("planId") long planId, @PathParam("stepId") long stepId) {
-        return stepRepository.find("plan.id = ?1 and id = ?2", planId, stepId).project(StepDto.class).singleResult();
+        return stepRepository.find("plan.id = ?1 and id = ?2 and plan.ownerId=?3",
+                planId, stepId, jwt.getSubject()).project(StepDto.class).singleResult();
     }
 
     @GET
     @Path("{stepId}/nexts")
     public List<NextStepWithParameterRelationDto> getAllNextsByIdForPlan(@PathParam("planId") long planId, @PathParam("stepId") long stepId) {
-        return nextStepRepository.getAdvancedNextSteps(planId, stepId);
+        return nextStepRepository.getAdvancedNextSteps(planId, stepId, jwt.getSubject());
     }
 
     @POST
     @Path("{stepId}/nexts")
     @Transactional
     public Response updateAllNextsByIdForPlan(@PathParam("planId") long planId, @PathParam("stepId") long stepId, List<NextStepWithParameterRelationDto> nexts) throws IllegalStateException, SecurityException, SystemException {
+        Step step = stepRepository.findById(stepId);
+
+        if(!step.plan.ownerId.equals(jwt.getSubject())) {
+            return Response.notModified().build();
+        }
+
         relationRepository
         .getEntityManager()
         .createQuery("""
@@ -93,7 +106,6 @@ public class StepResource {
         //POSTGRES doesnt support cross join delete:
         //relationRepository.delete("fromArg.step.plan.id=?1", planId);
         //nextStepRepository.delete("delete from NextStep where fromStep.plan.id = ?1", planId);
-        Step step = stepRepository.findById(stepId);
         for (NextStepWithParameterRelationDto nextDto : nexts) {
             Step toStep = stepRepository.findById(nextDto.getToStep().getId());
             if(toStep == null) {
@@ -123,7 +135,7 @@ public class StepResource {
     @Transactional
     @Path("{stepId}")
     public Response deleteStepById(@PathParam("planId") long planId, @PathParam("stepId") long stepId) {
-        Step step = stepRepository.find("plan.id = ?1 and id = ?2", planId, stepId).singleResult();
+        Step step = stepRepository.find("plan.id = ?1 and id = ?2 and plan.ownerId=?3", planId, stepId, jwt.getSubject()).singleResult();
         if(step == null) {
             return Response.status(404).build();
         }

@@ -1,6 +1,5 @@
 package com.ptt;
 
-import com.ptt.control.UserRepository;
 import com.ptt.control.argument.InputArgumentRepository;
 import com.ptt.control.argument.OutputArgumentRepository;
 import com.ptt.control.plan.PlanRepository;
@@ -9,7 +8,6 @@ import com.ptt.control.step.NextStepRepository;
 import com.ptt.control.step.ScriptStepRepository;
 import com.ptt.control.step.StepParameterRelationRepository;
 import com.ptt.control.step.StepRepository;
-import com.ptt.entity.*;
 import com.ptt.entity.argument.InputArgument;
 import com.ptt.entity.argument.OutputArgument;
 import com.ptt.entity.argument.OutputType;
@@ -27,8 +25,6 @@ import javax.transaction.Transactional;
 public class InitBean {
     String BASE_URL = "http://ptt-test-environment-service:8080";
 
-    @Inject
-    UserRepository userRepository;
     @Inject
     PlanRepository planRepository;
     @Inject
@@ -52,19 +48,15 @@ public class InitBean {
         if (ProfileManager.getActiveProfile().equals("prod")) {
             //return;
         }
-        User defaultUser = new User();
-        defaultUser.username = "default";
-        userRepository.persist(defaultUser);
-        System.out.println(defaultUser.id);
 
-        createDefaultTestPlan(defaultUser);
+        createDefaultTestPlan("842d65fe-7ddb-45bf-9d72-6360691ff196");
     }
 
-    private void createDefaultTestPlan(User user) {
+    private void createDefaultTestPlan(String userId) {
         Plan plan = new Plan();
         plan.name = "PTT TestSite";
         plan.description = "Test Plan for the PTT Test Website (https://test.perftest.tech)";
-        plan.user = user;
+        plan.ownerId = userId;
         planRepository.persist(plan);
 
         ScriptStep createUser = new ScriptStep();

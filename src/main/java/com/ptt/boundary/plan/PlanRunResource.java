@@ -4,12 +4,10 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.security.PermitAll;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
 import com.ptt.control.plan.PlanRepository;
@@ -21,6 +19,10 @@ import com.ptt.entity.plan.PlanRun;
 import com.ptt.entity.plan.PlanRunInstruction;
 import com.ptt.entity.dto.PlanRunDto;
 import com.ptt.entity.dto.PlanRunInstructionDto;
+import io.fabric8.kubernetes.api.model.Preconditions;
+import io.quarkus.security.Authenticated;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 
 @Path("planrun")
 public class PlanRunResource {
@@ -36,15 +38,34 @@ public class PlanRunResource {
     @Inject
     PttClientManager clientManager;
 
+    @Inject
+    JsonWebToken jwt;
+
+    @ConfigProperty(name = "client.token")
+    String clientToken; // Token used for communication with client
+
     @GET
+    @Authenticated
     public List<PlanRunDto> getAllPlanRuns() {
         return planRunRepository.findAll().project(PlanRunDto.class).list();
     }
 
     @GET
     @Path("{planrunid}")
-    public Response getPlanRunById(@PathParam("planrunid") long id) {
-        PlanRunDto planRunDto = planRunRepository.find("id", id).project(PlanRunDto.class).firstResult();
+    @PermitAll
+    public Response getPlanRunById(@PathParam("planrunid") long id, @QueryParam("token") String clientToken) {
+        PlanRunDto planRunDto;
+        if(this.clientToken.equals(clientToken)) {
+             planRunDto = planRunRepository.find("id", id)
+                    .project(PlanRunDto.class).firstResult();
+        }
+        else if(jwt == null) {
+            return Response.status(404).build();
+        }
+        else {
+            planRunDto = planRunRepository.find("id=?1 and plan.ownerId=?2", id, jwt.getSubject())
+                    .project(PlanRunDto.class).firstResult();
+        }
         if(planRunDto == null) {
           return Response.status(404).build();
         }
@@ -56,23 +77,28 @@ public class PlanRunResource {
 
     @GET
     @Path("/plan/{planId}")
+    @Authenticated
     public List<PlanRunDto> getPlanRunsForPlan(@PathParam("planId") long planId) {
-        return planRunRepository.find("plan.id", planId).project(PlanRunDto.class).list();
+        return planRunRepository.find("plan.id=?1 and plan.ownerId=?2", planId, jwt.getSubject()).project(PlanRunDto.class).list();
     }
 
     @POST
     @Transactional
+    @Authenticated
     public Response createPlanRun(PlanRunDto planRunDto) {
         Plan plan = planRepository.findById(planRunDto.getPlanId());
         if(plan == null) {
             return Response.status(400).build();
+        }
+        if(!plan.ownerId.equals(jwt.getSubject())){
+            return Response.status(403).build();
         }
         long currentTime = Instant.now().getEpochSecond();
 
         PlanRun planRun = new PlanRun();
         planRun.plan = plan;
         planRun.runOnce = planRunDto.isRunOnce();
-        planRun.startTime = planRunDto.getStartTime() <= currentTime ? currentTime : planRunDto.getStartTime();
+        planRun.startTime = Math.max(planRunDto.getStartTime(), currentTime);
         planRun.duration = planRunDto.getDuration();
         planRun.name = planRunDto.getName();
         planRunRepository.persist(planRun);
@@ -91,7 +117,7 @@ public class PlanRunResource {
         }
 
         if(planRun.startTime <= currentTime) {
-            clientManager.startClient(planRun.id, planRunDto.getPlanRunInstructions());
+            clientManager.startClient(planRun.id, planRunDto.getPlanRunInstructions(), clientToken);
         } else {
             return Response.status(501, "The scheduling of clients is not yet implemented!").build();
         }

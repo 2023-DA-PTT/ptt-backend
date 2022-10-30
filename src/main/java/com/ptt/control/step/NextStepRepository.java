@@ -16,9 +16,9 @@ public class NextStepRepository implements PanacheRepository<NextStep> {
     @Inject
     StepParameterRelationRepository stepParameterRelationRepository;
 
-    public List<NextStepWithParameterRelationDto> getAdvancedNextSteps(long planId, long stepId) {
+    public List<NextStepWithParameterRelationDto> getAdvancedNextSteps(long planId, long stepId, String ownerId) {
         List<NextStepWithParameterRelationDto> dtos =
-        find("fromStep.plan.id = ?1 and fromStep.id = ?2", planId, stepId)
+        find("fromStep.plan.id = ?1 and fromStep.id = ?2 and fromStep.plan.ownerId=?3", planId, stepId, ownerId)
         .project(NextStepWithParameterRelationDto.class)
         .list();
 

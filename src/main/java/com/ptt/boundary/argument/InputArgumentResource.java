@@ -5,6 +5,8 @@ import com.ptt.control.step.StepRepository;
 import com.ptt.entity.argument.InputArgument;
 import com.ptt.entity.step.Step;
 import com.ptt.entity.dto.InputArgumentDto;
+import io.quarkus.security.Authenticated;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -17,9 +19,13 @@ import java.util.List;
 @Path("plan/{planId}/step/{stepId}/inputArgument")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@Authenticated
 public class InputArgumentResource {
     @Inject
     InputArgumentRepository inputArgumentRepository;
+
+    @Inject
+    JsonWebToken jwt;
 
     @Inject
     StepRepository stepRepository;
@@ -34,6 +40,11 @@ public class InputArgumentResource {
         if(step == null) {
             return Response.status(400).build();
         }
+
+        if(!step.plan.ownerId.equals(jwt.getSubject())) {
+            return Response.status(403).build();
+        }
+
         InputArgument inputArgument = new InputArgument();
         inputArgument.name = inputArgumentDto.getName();
         inputArgument.step = step;
@@ -53,6 +64,11 @@ public class InputArgumentResource {
         if(step == null) {
             return Response.status(400).build();
         }
+
+        if(!step.plan.ownerId.equals(jwt.getSubject())) {
+            return Response.status(403).build();
+        }
+
         InputArgument arg = inputArgumentRepository.findById(inArgId);
         if(arg == null) {
             return Response.status(404).build();
@@ -73,6 +89,9 @@ public class InputArgumentResource {
         if(inputArgument == null) {
             return Response.status(404).build();
         }
+        if(inputArgument.step.plan.ownerId.equals(jwt.getSubject())) {
+            return Response.status(403).build();
+        }
         inputArgumentRepository.delete(inputArgument);
         return Response.ok(InputArgumentDto.from(inputArgument)).build();
     }
@@ -82,7 +101,7 @@ public class InputArgumentResource {
             @PathParam("planId") long planId,
             @PathParam("stepId") long stepId) {
         return inputArgumentRepository
-                .find("step.id=?1 and step.plan.id=?2", stepId, planId)
+                .find("step.id=?1 and step.plan.id=?2 and step.plan.ownerId=?3", stepId, planId, jwt.getSubject())
                 .project(InputArgumentDto.class)
                 .list();
     }
@@ -94,7 +113,7 @@ public class InputArgumentResource {
             @PathParam("stepId") long stepId,
             @PathParam("inArgId") long inArgId) {
         return inputArgumentRepository
-                .find("id=?1 and step.id=?2 and step.plan.id=?3", inArgId, stepId, planId)
+                .find("id=?1 and step.id=?2 and step.plan.id=?3 and step.plan.ownerId=?4", inArgId, stepId, planId, jwt.getSubject())
                 .project(InputArgumentDto.class)
                 .firstResult();
     }

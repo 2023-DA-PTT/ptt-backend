@@ -5,6 +5,8 @@ import com.ptt.control.step.StepRepository;
 import com.ptt.entity.argument.OutputArgument;
 import com.ptt.entity.step.Step;
 import com.ptt.entity.dto.OutputArgumentDto;
+import io.quarkus.security.Authenticated;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -17,12 +19,15 @@ import java.util.List;
 @Path("plan/{planId}/step/{stepId}/outputArgument")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@Authenticated
 public class OutputArgumentResource {
 
     @Inject
     OutputArgumentRepository outputArgumentRepository;
     @Inject
     StepRepository stepRepository;
+    @Inject
+    JsonWebToken jwt;
 
     @POST
     @Transactional
@@ -33,6 +38,9 @@ public class OutputArgumentResource {
         Step step = stepRepository.findById(stepId);
         if(step == null) {
             return Response.status(400).build();
+        }
+        if(!step.plan.ownerId.equals(jwt.getSubject())) {
+            return Response.status(403).build();
         }
         OutputArgument outputArgument = new OutputArgument();
         outputArgument.step = step;
@@ -54,6 +62,9 @@ public class OutputArgumentResource {
         Step step = stepRepository.findById(stepId);
         if(step == null) {
             return Response.status(400).build();
+        }
+        if(!step.plan.ownerId.equals(jwt.getSubject())) {
+            return Response.status(403).build();
         }
         OutputArgument arg = outputArgumentRepository.findById(outArgId);
         if(arg == null) {
@@ -77,6 +88,9 @@ public class OutputArgumentResource {
         if(outputArgument == null) {
             return Response.status(404).build();
         }
+        if(!outputArgument.step.plan.ownerId.equals(jwt.getSubject())) {
+            return Response.status(403).build();
+        }
         outputArgumentRepository.delete(outputArgument);
         return Response.ok(OutputArgumentDto.from(outputArgument)).build();
     }
@@ -86,7 +100,7 @@ public class OutputArgumentResource {
             @PathParam("planId") long planId,
             @PathParam("stepId") long stepId) {
         return outputArgumentRepository
-                .find("step.id=?1 and step.plan.id=?2", stepId, planId)
+                .find("step.id=?1 and step.plan.id=?2 and step.plan.ownerId=?3", stepId, planId, jwt.getSubject())
                 .project(OutputArgumentDto.class)
                 .list();
     }
@@ -98,7 +112,7 @@ public class OutputArgumentResource {
             @PathParam("stepId") long stepId,
             @PathParam("outArgId") long outArgId) {
         return outputArgumentRepository
-                .find("id=?1 and step.id=?2 and step.plan.id=?3", outArgId, stepId, planId)
+                .find("id=?1 and step.id=?2 and step.plan.id=?3 and step.plan.ownerId=?4", outArgId, stepId, planId, jwt.getSubject())
                 .project(OutputArgumentDto.class)
                 .firstResult();
     }

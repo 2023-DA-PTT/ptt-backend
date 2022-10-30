@@ -1,6 +1,5 @@
 package com.ptt.entity.plan;
 
-import com.ptt.entity.User;
 import com.ptt.entity.step.Step;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 
@@ -15,8 +14,7 @@ public class Plan extends PanacheEntityBase {
     public Long id;
     @OneToOne
     public Step start;
-    @ManyToOne
-    public User user;
+    public String ownerId;
     @OneToMany(mappedBy = "plan")
     public List<Step> steps;
     public String name;

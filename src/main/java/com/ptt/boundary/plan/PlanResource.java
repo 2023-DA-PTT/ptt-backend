@@ -1,41 +1,25 @@
 package com.ptt.boundary.plan;
 
-import com.ptt.control.step.HttpStepHeaderRepository;
-import com.ptt.control.step.HttpStepRepository;
 import com.ptt.control.argument.InputArgumentRepository;
-import com.ptt.control.step.NextStepRepository;
 import com.ptt.control.argument.OutputArgumentRepository;
 import com.ptt.control.plan.PlanRepository;
-import com.ptt.control.step.ScriptStepRepository;
-import com.ptt.control.step.StepParameterRelationRepository;
-import com.ptt.control.UserRepository;
-import com.ptt.entity.step.HttpStep;
-import com.ptt.entity.step.HttpStepHeader;
+import com.ptt.control.step.*;
 import com.ptt.entity.argument.InputArgument;
-import com.ptt.entity.step.NextStep;
 import com.ptt.entity.argument.OutputArgument;
+import com.ptt.entity.dto.*;
 import com.ptt.entity.plan.Plan;
-import com.ptt.entity.step.ScriptStep;
-import com.ptt.entity.step.Step;
-import com.ptt.entity.step.StepParameterRelation;
-import com.ptt.entity.User;
-import com.ptt.entity.dto.HttpStepDto;
-import com.ptt.entity.dto.HttpStepHeaderDto;
-import com.ptt.entity.dto.InputArgumentDto;
-import com.ptt.entity.dto.OutputArgumentDto;
-import com.ptt.entity.dto.PlanDto;
-import com.ptt.entity.dto.PlanExportDto;
-import com.ptt.entity.dto.ScriptStepDto;
-import com.ptt.entity.dto.SimpleNextStepDto;
-import com.ptt.entity.dto.StepParameterRelationDto;
+import com.ptt.entity.step.*;
+import io.quarkus.security.Authenticated;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 
+import javax.annotation.security.PermitAll;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,9 +35,10 @@ public class PlanResource {
     }
 
     @Inject
-    PlanRepository planRepository;
+    JsonWebToken jwt;
+
     @Inject
-    UserRepository userRepository;
+    PlanRepository planRepository;
     @Inject
     HttpStepRepository httpStepRepository;
     @Inject
@@ -69,48 +54,50 @@ public class PlanResource {
     @Inject
     HttpStepHeaderRepository httpStepHeaderRepository;
 
-    @GET
-    public List<PlanDto> getAllPlans() {
-       return planRepository.findAll().project(PlanDto.class).list();
-    }
+    @ConfigProperty(name = "client.token")
+    String clientToken; // Token used for communication with client
 
     @GET
-    @Path("user/{userId}")
-    public List<PlanDto> getAllPlansForUser(@PathParam("userId") long userId) {
-        return planRepository.find("user.id", userId).project(PlanDto.class).list();
+    @Authenticated
+    public List<PlanDto> getAllPlansForUser() {
+        return planRepository.find("ownerId", jwt.getSubject()).project(PlanDto.class).list();
     }
 
     @GET
     @Path("{id}")
+    @Authenticated
     public PlanDto getPlanById(@PathParam("id") long planId) {
-        return planRepository.find("id", planId).project(PlanDto.class).singleResult();
+        return planRepository.find("id=?1 and ownerId=?2", planId, jwt.getSubject()).project(PlanDto.class).singleResult();
     }
 
     @POST
-    @Path("{userId}")
     @Transactional
-    public Response createPlanForUser(@PathParam("userId") long userId, PlanDto planDto) {
-        User user = userRepository.findById(userId);
-        if(user == null) {
-            return Response.status(400).build();
-        }
+    @Authenticated
+    public Response createPlanForUser(PlanDto planDto) {
         Plan plan = new Plan();
         plan.name = planDto.getName();
         plan.description = planDto.getDescription();
-        plan.user = user;
+        plan.ownerId = jwt.getSubject();
         planRepository.persist(plan);
         return Response.ok(PlanDto.from(plan)).status(201).build();
     }
 
     @GET
     @Path("export/{id}")
+    @PermitAll
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response export(@PathParam("id") long planId) {
+    public Response export(@PathParam("id") long planId, @QueryParam("token") String token) {
         PlanExportDto exportDto = new PlanExportDto();
         Plan plan = planRepository.find("id", planId).firstResult();
         if(plan == null) {
             return Response.status(404).build();
+        }
+        if(!clientToken.equals(token) && !plan.ownerId.equals(jwt.getSubject())){
+            if (jwt.getSubject() == null) {
+                return Response.status(401).build();
+            }
+            return Response.status(403).build();
         }
         List<HttpStepDto> httpSteps = httpStepRepository.find("plan.id", planId).list().stream().map(HttpStepDto::from).collect(Collectors.toList());
         List<ScriptStepDto> scriptSteps = scriptStepRepository.find("plan.id", planId).project(ScriptStepDto.class).list();
@@ -135,10 +122,12 @@ public class PlanResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
+    @Authenticated
     public Response importPlan(PlanExportDto importDto) {
         Plan plan = new Plan();
         plan.name = importDto.getPlan().getName();
         plan.description = importDto.getPlan().getDescription();
+        plan.ownerId = jwt.getSubject();
         planRepository.persist(plan);
 
         Map<Long, Step> stepLookUp = new HashMap<>();

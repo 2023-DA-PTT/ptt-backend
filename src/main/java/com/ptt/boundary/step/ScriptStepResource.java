@@ -20,17 +20,23 @@ import com.ptt.control.step.StepRepository;
 import com.ptt.entity.step.ScriptStep;
 import com.ptt.entity.plan.Plan;
 import com.ptt.entity.dto.ScriptStepDto;
+import io.quarkus.security.Authenticated;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 
 
 @Path("plan/{planId}/step")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@Authenticated
 public class ScriptStepResource {
     @Inject
     StepRepository stepRepository;
 
     @Inject
     PlanRepository planRepository;
+
+    @Inject
+    JsonWebToken jwt;
 
     @Inject
     ScriptStepRepository scriptStepRepository;
@@ -44,6 +50,10 @@ public class ScriptStepResource {
         Plan plan = planRepository.findById(planId);
         if(plan == null) {
             return Response.status(400).build();
+        }
+
+        if (!plan.ownerId.equals(jwt.getSubject())) {
+            return Response.status(403).build();
         }
 
         ScriptStep scriptStep = new ScriptStep();
@@ -66,6 +76,9 @@ public class ScriptStepResource {
         Plan plan = planRepository.findById(planId);
         if(plan == null) {
             return Response.status(400).build();
+        }
+        if (!plan.ownerId.equals(jwt.getSubject())) {
+            return Response.status(403).build();
         }
         ScriptStep scriptStep = scriptStepRepository
             .find("id=?1", stepId).firstResult();
@@ -91,6 +104,9 @@ public class ScriptStepResource {
         if(plan == null) {
             return Response.status(400).build();
         }
+        if (!plan.ownerId.equals(jwt.getSubject())) {
+            return Response.status(403).build();
+        }
         ScriptStep scriptStep = scriptStepRepository
             .find("id=?1", stepId).firstResult();
         if(scriptStep == null) {
@@ -103,6 +119,6 @@ public class ScriptStepResource {
     @GET
     @Path("script")
     public List<ScriptStepDto> getAllScriptStepsForPlan(@PathParam("planId") long planId) {
-        return scriptStepRepository.find("plan.id", planId).project(ScriptStepDto.class).list();
+        return scriptStepRepository.find("plan.id=?1 and plan.ownerId=?2", planId, jwt.getSubject()).project(ScriptStepDto.class).list();
     }
 }

@@ -23,16 +23,22 @@ import com.ptt.entity.step.HttpStep;
 import com.ptt.entity.step.HttpStepHeader;
 import com.ptt.entity.plan.Plan;
 import com.ptt.entity.dto.HttpStepDto;
+import io.quarkus.security.Authenticated;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 
 @Path("plan/{planId}/step")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@Authenticated
 public class HttpStepResource {
     @Inject
     StepRepository stepRepository;
 
     @Inject
     PlanRepository planRepository;
+
+    @Inject
+    JsonWebToken jwt;
 
     @Inject
     HttpStepRepository httpStepRepository;
@@ -48,6 +54,10 @@ public class HttpStepResource {
         Plan plan = planRepository.findById(planId);
         if (plan == null) {
             return Response.status(400).build();
+        }
+
+        if (!plan.ownerId.equals(jwt.getSubject())) {
+            return Response.status(403).build();
         }
 
         HttpStep httpStep = new HttpStep();
@@ -83,6 +93,11 @@ public class HttpStepResource {
         if (plan == null) {
             return Response.status(400).build();
         }
+
+        if (!plan.ownerId.equals(jwt.getSubject())) {
+            return Response.status(403).build();
+        }
+
         HttpStep httpStep = httpStepRepository
                 .find("id=?1", stepId).firstResult();
         if (httpStep == null) {
@@ -131,6 +146,9 @@ public class HttpStepResource {
         if (plan == null) {
             return Response.status(400).build();
         }
+        if (!plan.ownerId.equals(jwt.getSubject())) {
+            return Response.status(403).build();
+        }
         HttpStep httpStep = httpStepRepository
                 .find("id=?1", stepId).firstResult();
         if (httpStep == null) {
@@ -144,6 +162,6 @@ public class HttpStepResource {
     @GET
     @Path("http")
     public List<HttpStepDto> getAllHttpStepsForPlan(@PathParam("planId") long planId) {
-        return httpStepRepository.find("plan.id", planId).list().stream().map(HttpStepDto::from).collect(Collectors.toList());
+        return httpStepRepository.find("plan.id=?1 and plan.ownerId=?2", planId, jwt.getSubject()).list().stream().map(HttpStepDto::from).collect(Collectors.toList());
     }
 }
