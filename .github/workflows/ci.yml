@@ -79,7 +79,7 @@ jobs:
         with:
           version: 'v3.10.1'
         id: install
-#      - name: Rollout Restart Deployment
-#        run: kubectl rollout restart deployment ptt-backend --namespace=ptt
       - name: Upgrade Helm Deployment
         run: helm upgrade --install ptt-backend ./helm --namespace ptt
+      - name: Rollout Restart Deployment
+        run: kubectl rollout restart deployment ptt-backend --namespace=ptt
