@@ -69,6 +69,7 @@ public class PlanRunResource {
         if(planRunDto == null) {
           return Response.status(404).build();
         }
+
         planRunDto.setPlanRunInstructions(planRunInstructionRepository
             .find("planRun.id", planRunDto.getId())
             .project(PlanRunInstructionDto.class).list());

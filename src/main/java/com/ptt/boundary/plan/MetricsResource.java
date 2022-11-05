@@ -68,7 +68,7 @@ public class MetricsResource {
     @GET
     @Path("/test-run/{testRunId}/duration")
     public long getPlanRunDuration(@PathParam("testRunId") long planRunId) {
-        return em.createQuery("SELECT coalesce(MAX(dp.startTime)-MIN(dp.startTime),0) FROM DataPoint dp " +
+        return em.createQuery("SELECT coalesce(MAX(dp.startTime+(dp.duration/1000000))-MIN(dp.startTime+(dp.duration/1000000)),0) FROM DataPoint dp " +
                         "where dp.planRun.plan.ownerId=?1 and dp.planRun.id=?2", Long.class)
                 .setParameter(1, jwt.getSubject())
                 .setParameter(2, planRunId).getSingleResult();
@@ -81,5 +81,11 @@ public class MetricsResource {
                 .firstResultOptional()
                 .map(planRun -> Response.ok(planRun.id).build())
                 .orElse(Response.noContent().build());
+    }
+
+    @GET
+    @Path("/test-run/{testRunId}/first-datapoint")
+    public Long getFirstDataPointOfPlanRun(@PathParam("testRunId") long planRunId) {
+        return planRunRepository.getFirstDatapointStartTime(jwt.getSubject(), planRunId);
     }
 }
