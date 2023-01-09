@@ -82,6 +82,28 @@ public class PlanResource {
         return Response.ok(PlanDto.from(plan)).status(201).build();
     }
 
+    @POST
+    @Transactional
+    @Authenticated
+    @Path("start/{id}")
+    public Response setPlanStartId(@PathParam("id") long planId, long startId) {
+        Plan plan = planRepository.find("id", planId).firstResult();
+        Step startStep = httpStepRepository.find("id", startId).firstResult();
+        if(plan == null) {
+            return Response.status(404).build();
+        }
+        if(!plan.ownerId.equals(jwt.getSubject())){
+            if (jwt.getSubject() == null) {
+                return Response.status(401).build();
+            }
+            return Response.status(403).build();
+        }
+
+        plan.start = startStep;
+        planRepository.persist(plan);
+        return Response.ok(PlanDto.from(plan)).status(201).build();
+    }
+
     @GET
     @Path("export/{id}")
     @PermitAll
