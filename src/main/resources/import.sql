@@ -18,7 +18,7 @@ as
             ), range AS (
                 SELECT r_from, (r_from + (interv-1)) AS r_to FROM series -- 9 = interval (10 years) minus 1
             )
-            SELECT (SELECT MAX(dp.duration) FROM datapoint dp WHERE (starttime BETWEEN r_from AND r_to)
+            SELECT (SELECT AVG(dp.duration) FROM datapoint dp WHERE (starttime BETWEEN r_from AND r_to)
                                                                 AND planrun_id = planid
                                                                 AND step_step_id = stepid ) as duration, r_from as start
             FROM range where (SELECT count(dp.duration) FROM datapoint dp WHERE (starttime BETWEEN r_from AND r_to)
